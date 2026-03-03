@@ -171,7 +171,7 @@ export default function StorePage() {
                     <div className="list-price-col">
                       <strong>{formatPrice(item.price)} ₽</strong>
                       {item.old_price ? <span className="old-price">{formatPrice(item.old_price)} ₽</span> : null}
-                      {discount ? <span className="discount">{discount}% off</span> : null}
+                      {discount ? <span className="discount">{discount}% скидка</span> : null}
                       <span className="list-toggle">{isOpen ? 'Свернуть ▲' : 'Подробнее ▼'}</span>
                     </div>
                   </button>
