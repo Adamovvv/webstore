@@ -164,14 +164,21 @@ export default function AdminPage() {
   const onAdFileChange = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
+    if (!session?.user) {
+      alert('Сессия истекла. Войдите в админку заново.')
+      return
+    }
 
     setAdUploading(true)
-    const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]/g, '-')
-    const path = `ads/${Date.now()}-${safeName}`
-    const { error: uploadError } = await supabase.storage.from('store-assets').upload(path, file, { upsert: true })
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'png'
+    const path = `ads/${Date.now()}-${crypto.randomUUID()}.${fileExt}`
+    const { error: uploadError } = await supabase.storage.from('store-assets').upload(path, file, {
+      upsert: false,
+      cacheControl: '3600',
+    })
 
     if (uploadError) {
-      alert(uploadError.message)
+      alert(`Ошибка загрузки: ${uploadError.message}`)
       setAdUploading(false)
       return
     }
