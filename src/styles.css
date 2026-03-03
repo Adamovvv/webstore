@@ -388,6 +388,21 @@ select {
   min-height: 90px;
 }
 
+.admin-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.admin-checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
 .admin-actions {
   grid-column: 1 / -1;
   display: flex;

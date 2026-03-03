@@ -7,6 +7,7 @@ const initialForm = {
   category: 'Мегафон',
   image_url: '',
   description: '',
+  is_unlimited: false,
   badge: '',
   data_gb: '',
   price: '',
@@ -79,8 +80,11 @@ export default function AdminPage() {
   }, [session])
 
   const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((prev) => ({ ...prev, [name]: name.includes('price') || name.includes('gb') ? Number(value) : value }))
+    const { name, value, type, checked } = event.target
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : name.includes('price') || name.includes('gb') ? Number(value) : value,
+    }))
   }
 
   const handleCreds = (event) => {
@@ -116,6 +120,8 @@ export default function AdminPage() {
 
     const payload = {
       ...form,
+      is_unlimited: !!form.is_unlimited,
+      data_gb: form.is_unlimited ? 0 : Number(form.data_gb),
       description: form.description || null,
       old_price: form.old_price || null,
       badge: form.badge || null,
@@ -143,6 +149,7 @@ export default function AdminPage() {
       category: item.category || 'eSIM',
       image_url: item.image_url || '',
       description: item.description || '',
+      is_unlimited: item.is_unlimited ?? false,
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
       price: item.price ?? 0,
@@ -260,7 +267,19 @@ export default function AdminPage() {
           />
           <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
-          <input type="number" name="data_gb" value={form.data_gb} onChange={handleChange} placeholder="Data (GB)" required />
+          <label className="admin-checkbox">
+            <input type="checkbox" name="is_unlimited" checked={!!form.is_unlimited} onChange={handleChange} />
+            <span>Безлимитный интернет</span>
+          </label>
+          <input
+            type="number"
+            name="data_gb"
+            value={form.data_gb}
+            onChange={handleChange}
+            placeholder="Data (GB)"
+            required={!form.is_unlimited}
+            disabled={!!form.is_unlimited}
+          />
           <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="Price" required />
           <input type="number" name="old_price" value={form.old_price} onChange={handleChange} placeholder="Old price" />
 

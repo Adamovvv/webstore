@@ -14,6 +14,10 @@ function getDiscount(oldPrice, price) {
   return Math.round(((oldPrice - price) / oldPrice) * 100)
 }
 
+function getTrafficLabel(item) {
+  return item?.is_unlimited ? 'Безлимит' : `${item?.data_gb ?? '-'} GB`
+}
+
 export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
@@ -166,7 +170,7 @@ export default function StorePage() {
                     <div>
                       <p className="provider">{item.provider}</p>
                       <h3>{item.title}</h3>
-                      <p className="meta">{item.data_gb} GB</p>
+                      <p className="meta">{getTrafficLabel(item)}</p>
                     </div>
                     <div className="list-price-col">
                       <strong>{formatPrice(item.price)} ₽</strong>
@@ -178,7 +182,7 @@ export default function StorePage() {
                   <div className={isOpen ? 'list-card-details open' : 'list-card-details'}>
                     <div className="details-inner">
                       <p className="modal-row"><span>Категория</span><strong>{item.category || '-'}</strong></p>
-                      <p className="modal-row"><span>Трафик</span><strong>{item.data_gb ?? '-'} GB</strong></p>
+                      <p className="modal-row"><span>Трафик</span><strong>{getTrafficLabel(item)}</strong></p>
                       {item.badge ? <p className="modal-row"><span>Метка</span><strong>{item.badge}</strong></p> : null}
                       <div className="modal-description">
                         <p className="modal-description-title">Описание</p>
