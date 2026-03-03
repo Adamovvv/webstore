@@ -195,22 +195,31 @@ export default function StorePage() {
       {selectedProduct ? (
         <div className="product-modal-backdrop" onClick={() => setSelectedProduct(null)}>
           <section className="product-modal" onClick={(event) => event.stopPropagation()}>
-            <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)}>
-              Закрыть
-            </button>
+            <div className="modal-head">
+              <p className="modal-provider">{selectedProduct.provider || 'Провайдер'}</p>
+              <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Закрыть">
+                ✕
+              </button>
+            </div>
             <h2>{selectedProduct.title || 'Без названия'}</h2>
             {selectedProduct.image_url ? (
               <img className="modal-image" src={selectedProduct.image_url} alt={selectedProduct.title || 'Товар'} />
             ) : null}
+            <div className="modal-price-card">
+              <p className="modal-price-main">{selectedProduct.price != null ? `${formatPrice(selectedProduct.price)} ₽` : '-'}</p>
+              <div className="modal-price-meta">
+                {selectedProduct.old_price ? <span className="modal-old-price">{formatPrice(selectedProduct.old_price)} ₽</span> : null}
+                {getDiscount(selectedProduct.old_price, selectedProduct.price) ? (
+                  <span className="modal-discount">{getDiscount(selectedProduct.old_price, selectedProduct.price)}%</span>
+                ) : null}
+                {selectedProduct.badge ? <span className="modal-badge">{selectedProduct.badge}</span> : null}
+              </div>
+            </div>
             <div className="modal-grid">
-              <p><strong>Провайдер:</strong> {selectedProduct.provider || '-'}</p>
-              <p><strong>Категория:</strong> {selectedProduct.category || '-'}</p>
-              <p><strong>Трафик:</strong> {selectedProduct.data_gb ?? '-'} GB</p>
-              <p><strong>Цена:</strong> {selectedProduct.price != null ? `${formatPrice(selectedProduct.price)} ₽` : '-'}</p>
-              <p><strong>Старая цена:</strong> {selectedProduct.old_price ? `${formatPrice(selectedProduct.old_price)} ₽` : '-'}</p>
-              <p><strong>Бейдж:</strong> {selectedProduct.badge || '-'}</p>
-              <p><strong>ID:</strong> {selectedProduct.id || '-'}</p>
-              <p><strong>Создан:</strong> {selectedProduct.created_at ? new Date(selectedProduct.created_at).toLocaleString('ru-RU') : '-'}</p>
+              <p className="modal-row"><span>Категория</span><strong>{selectedProduct.category || '-'}</strong></p>
+              <p className="modal-row"><span>Трафик</span><strong>{selectedProduct.data_gb ?? '-'} GB</strong></p>
+              <p className="modal-row"><span>ID</span><strong>{selectedProduct.id || '-'}</strong></p>
+              <p className="modal-row"><span>Добавлен</span><strong>{selectedProduct.created_at ? new Date(selectedProduct.created_at).toLocaleString('ru-RU') : '-'}</strong></p>
             </div>
           </section>
         </div>
@@ -218,4 +227,3 @@ export default function StorePage() {
     </main>
   )
 }
-
