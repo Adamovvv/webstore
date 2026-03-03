@@ -64,12 +64,33 @@ select {
   line-height: 1.1;
 }
 
+.search-input-wrap {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #8d93ab;
+  pointer-events: none;
+}
+
+.search-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
 .search-row input {
   width: 100%;
   border: 0;
   background: #f0f2f8;
   border-radius: 16px;
-  padding: 12px 14px;
+  padding: 12px 14px 12px 38px;
 }
 
 .search-row input:focus,
@@ -77,6 +98,21 @@ select {
   background: #fff;
   border: 1px solid #d6dce7;
   outline: none;
+}
+
+.ad-banner {
+  display: block;
+  margin-top: 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(12, 21, 49, 0.15);
+}
+
+.ad-banner img {
+  width: 100%;
+  height: 130px;
+  display: block;
+  object-fit: cover;
 }
 
 .chips {
@@ -315,6 +351,19 @@ select {
 
 .admin-list {
   margin-top: 24px;
+}
+
+.admin-ad-settings {
+  margin-top: 24px;
+}
+
+.admin-ad-settings h2 {
+  margin: 0;
+}
+
+.admin-ad-settings p {
+  margin: 8px 0 0;
+  color: #58617f;
 }
 
 .table-wrap {

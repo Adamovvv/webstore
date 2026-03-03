@@ -18,6 +18,7 @@ export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
+  const [adImageUrl, setAdImageUrl] = useState('')
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -30,22 +31,33 @@ export default function StorePage() {
   }, [])
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchStoreData = async () => {
       setLoading(true)
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .order('created_at', { ascending: false })
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('store_settings')
+        .select('ad_image_url')
+        .eq('id', 1)
+        .maybeSingle()
 
       if (error) {
         console.error(error)
       } else {
         setProducts(data || [])
       }
+
+      if (settingsError) {
+        console.error(settingsError)
+      } else {
+        setAdImageUrl(settingsData?.ad_image_url || '')
+      }
       setLoading(false)
     }
 
-    fetchProducts()
+    fetchStoreData()
   }, [])
 
   useEffect(() => {
@@ -97,13 +109,25 @@ export default function StorePage() {
             <h1>Красивые номера &amp; Выгодные тарифы</h1>
           </div>
           <div className="search-row">
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Поиск тарифа или оператора..."
-            />
+            <div className="search-input-wrap">
+              <span className="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M10.5 3a7.5 7.5 0 0 1 5.95 12.07l4.74 4.74a1 1 0 1 1-1.42 1.42l-4.74-4.74A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" />
+                </svg>
+              </span>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Поиск тарифа или оператора..."
+              />
+            </div>
           </div>
+          {adImageUrl ? (
+            <a className="ad-banner" href={adImageUrl} target="_blank" rel="noreferrer">
+              <img src={adImageUrl} alt="Рекламный баннер" />
+            </a>
+          ) : null}
         </header>
 
         <div className="chips">
@@ -157,6 +181,5 @@ export default function StorePage() {
     </main>
   )
 }
-
 
 

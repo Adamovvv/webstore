@@ -18,10 +18,13 @@ export default function AdminPage() {
   const [authLoading, setAuthLoading] = useState(true)
 
   const [products, setProducts] = useState([])
+  const [adImageUrl, setAdImageUrl] = useState('')
   const [form, setForm] = useState(initialForm)
   const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [adUploading, setAdUploading] = useState(false)
+  const [adSaving, setAdSaving] = useState(false)
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -52,9 +55,25 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  const fetchStoreSettings = async () => {
+    const { data, error } = await supabase
+      .from('store_settings')
+      .select('ad_image_url')
+      .eq('id', 1)
+      .maybeSingle()
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    setAdImageUrl(data?.ad_image_url || '')
+  }
+
   useEffect(() => {
     if (session) {
       fetchProducts()
+      fetchStoreSettings()
     }
   }, [session])
 
@@ -139,6 +158,40 @@ export default function AdminPage() {
     await fetchProducts()
   }
 
+  const onAdFileChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setAdUploading(true)
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]/g, '-')
+    const path = `ads/${Date.now()}-${safeName}`
+    const { error: uploadError } = await supabase.storage.from('store-assets').upload(path, file, { upsert: true })
+
+    if (uploadError) {
+      alert(uploadError.message)
+      setAdUploading(false)
+      return
+    }
+
+    const { data } = supabase.storage.from('store-assets').getPublicUrl(path)
+    setAdImageUrl(data.publicUrl)
+    setAdUploading(false)
+  }
+
+  const saveAdImage = async () => {
+    setAdSaving(true)
+    const { error } = await supabase
+      .from('store_settings')
+      .upsert({ id: 1, ad_image_url: adImageUrl || null }, { onConflict: 'id' })
+
+    if (error) {
+      alert(error.message)
+    } else {
+      alert('Рекламный баннер сохранен')
+    }
+    setAdSaving(false)
+  }
+
   if (authLoading && !session) {
     return (
       <main className="admin-page">
@@ -199,6 +252,25 @@ export default function AdminPage() {
             {editingId ? <button type="button" onClick={resetForm}>Cancel edit</button> : null}
           </div>
         </form>
+
+        <section className="admin-ad-settings">
+          <h2>Рекламный баннер</h2>
+          <p>Загрузите изображение или вставьте URL, затем сохраните.</p>
+          <div className="admin-form">
+            <input
+              type="url"
+              value={adImageUrl}
+              onChange={(event) => setAdImageUrl(event.target.value)}
+              placeholder="https://example.com/banner.jpg"
+            />
+            <input type="file" accept="image/*" onChange={onAdFileChange} />
+            <div className="admin-actions">
+              <button type="button" onClick={saveAdImage} disabled={adSaving || adUploading}>
+                {adUploading ? 'Uploading...' : adSaving ? 'Saving...' : 'Save banner'}
+              </button>
+            </div>
+          </div>
+        </section>
 
         <section className="admin-list">
           <h2>Products</h2>
