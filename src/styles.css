@@ -102,10 +102,9 @@ select {
 
 .ad-banner {
   display: block;
-  margin-top: 12px;
+  margin-top: 16px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(12, 21, 49, 0.15);
 }
 
 .ad-banner img {
@@ -165,6 +164,13 @@ select {
   overflow: hidden;
   background: white;
   box-shadow: 0 6px 20px rgba(16, 19, 35, 0.1);
+  cursor: pointer;
+  border: 0;
+}
+
+.card:focus-visible {
+  outline: 2px solid #2d7ff9;
+  outline-offset: 2px;
 }
 
 .card-media-wrap {
@@ -250,6 +256,55 @@ select {
 
 .empty {
   color: #727991;
+}
+
+.product-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 12, 23, 0.65);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 999;
+}
+
+.product-modal {
+  width: min(420px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.modal-close {
+  border: 0;
+  background: #eef2ff;
+  color: #2b3463;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-left: auto;
+  display: block;
+}
+
+.product-modal h2 {
+  margin: 10px 0 12px;
+}
+
+.modal-image {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.modal-grid {
+  margin-top: 12px;
+}
+
+.modal-grid p {
+  margin: 8px 0;
+  font-size: 14px;
 }
 
 .desktop-gate {

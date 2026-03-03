@@ -19,6 +19,7 @@ export default function StorePage() {
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
   const [adImageUrl, setAdImageUrl] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -151,7 +152,19 @@ export default function StorePage() {
             {filtered.map((item) => {
               const discount = getDiscount(item.old_price, item.price)
               return (
-                <article key={item.id} className="card">
+                <article
+                  key={item.id}
+                  className="card"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedProduct(item)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      setSelectedProduct(item)
+                    }
+                  }}
+                >
                   <div className="card-media-wrap">
                     {item.badge ? <span className="badge">{item.badge}</span> : null}
                     {item.image_url ? (
@@ -178,8 +191,31 @@ export default function StorePage() {
           {!loading && filtered.length === 0 ? <p className="empty">No products found. Add items in the admin panel.</p> : null}
         </section>
       </section>
+
+      {selectedProduct ? (
+        <div className="product-modal-backdrop" onClick={() => setSelectedProduct(null)}>
+          <section className="product-modal" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)}>
+              Закрыть
+            </button>
+            <h2>{selectedProduct.title || 'Без названия'}</h2>
+            {selectedProduct.image_url ? (
+              <img className="modal-image" src={selectedProduct.image_url} alt={selectedProduct.title || 'Товар'} />
+            ) : null}
+            <div className="modal-grid">
+              <p><strong>Провайдер:</strong> {selectedProduct.provider || '-'}</p>
+              <p><strong>Категория:</strong> {selectedProduct.category || '-'}</p>
+              <p><strong>Трафик:</strong> {selectedProduct.data_gb ?? '-'} GB</p>
+              <p><strong>Цена:</strong> {selectedProduct.price != null ? `${formatPrice(selectedProduct.price)} ₽` : '-'}</p>
+              <p><strong>Старая цена:</strong> {selectedProduct.old_price ? `${formatPrice(selectedProduct.old_price)} ₽` : '-'}</p>
+              <p><strong>Бейдж:</strong> {selectedProduct.badge || '-'}</p>
+              <p><strong>ID:</strong> {selectedProduct.id || '-'}</p>
+              <p><strong>Создан:</strong> {selectedProduct.created_at ? new Date(selectedProduct.created_at).toLocaleString('ru-RU') : '-'}</p>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </main>
   )
 }
-
 
