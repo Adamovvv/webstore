@@ -19,7 +19,7 @@ export default function StorePage() {
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
   const [adImageUrl, setAdImageUrl] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [openedProductId, setOpenedProductId] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -148,39 +148,41 @@ export default function StorePage() {
             <h2>{loading ? 'Loading...' : `${filtered.length} Товаров`}</h2>
           </div>
 
-          <div className="grid">
+          <div className="products-list">
             {filtered.map((item) => {
               const discount = getDiscount(item.old_price, item.price)
+              const isOpen = openedProductId === item.id
               return (
                 <article
                   key={item.id}
-                  className="card"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setSelectedProduct(item)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault()
-                      setSelectedProduct(item)
-                    }
-                  }}
+                  className={isOpen ? 'list-card open' : 'list-card'}
                 >
-                  <div className="card-media-wrap">
-                    {item.badge ? <span className="badge">{item.badge}</span> : null}
-                    {item.image_url ? (
-                      <img src={item.image_url} alt={item.title} className="card-media" />
-                    ) : (
-                      <div className="card-placeholder">No image</div>
-                    )}
-                  </div>
-                  <div className="card-body">
-                    <p className="provider">{item.provider}</p>
-                    <h3>{item.title}</h3>
-                    <p className="meta">{item.data_gb} GB</p>
-                    <div className="price-row">
-                      <strong>?{formatPrice(item.price)}</strong>
-                      {item.old_price ? <span className="old-price">?{formatPrice(item.old_price)}</span> : null}
+                  <button
+                    type="button"
+                    className="list-card-main"
+                    onClick={() => setOpenedProductId(isOpen ? null : item.id)}
+                    aria-expanded={isOpen}
+                  >
+                    <div>
+                      <p className="provider">{item.provider}</p>
+                      <h3>{item.title}</h3>
+                      <p className="meta">{item.data_gb} GB</p>
+                    </div>
+                    <div className="list-price-col">
+                      <strong>{formatPrice(item.price)} ₽</strong>
+                      {item.old_price ? <span className="old-price">{formatPrice(item.old_price)} ₽</span> : null}
                       {discount ? <span className="discount">{discount}% off</span> : null}
+                    </div>
+                  </button>
+                  <div className={isOpen ? 'list-card-details open' : 'list-card-details'}>
+                    <div className="details-inner">
+                      <p className="modal-row"><span>Категория</span><strong>{item.category || '-'}</strong></p>
+                      <p className="modal-row"><span>Трафик</span><strong>{item.data_gb ?? '-'} GB</strong></p>
+                      {item.badge ? <p className="modal-row"><span>Метка</span><strong>{item.badge}</strong></p> : null}
+                      <div className="modal-description">
+                        <p className="modal-description-title">Описание</p>
+                        <p>{item.description || 'Описание пока не добавлено.'}</p>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -191,41 +193,6 @@ export default function StorePage() {
           {!loading && filtered.length === 0 ? <p className="empty">No products found. Add items in the admin panel.</p> : null}
         </section>
       </section>
-
-      {selectedProduct ? (
-        <div className="product-modal-backdrop" onClick={() => setSelectedProduct(null)}>
-          <section className="product-modal" onClick={(event) => event.stopPropagation()}>
-            <div className="modal-head">
-              <p className="modal-provider">{selectedProduct.provider || 'Провайдер'}</p>
-              <button type="button" className="modal-close" onClick={() => setSelectedProduct(null)} aria-label="Закрыть">
-                ✕
-              </button>
-            </div>
-            <h2>{selectedProduct.title || 'Без названия'}</h2>
-            {selectedProduct.image_url ? (
-              <img className="modal-image" src={selectedProduct.image_url} alt={selectedProduct.title || 'Товар'} />
-            ) : null}
-            <div className="modal-price-card">
-              <p className="modal-price-main">{selectedProduct.price != null ? `${formatPrice(selectedProduct.price)} ₽` : '-'}</p>
-              <div className="modal-price-meta">
-                {selectedProduct.old_price ? <span className="modal-old-price">{formatPrice(selectedProduct.old_price)} ₽</span> : null}
-                {getDiscount(selectedProduct.old_price, selectedProduct.price) ? (
-                  <span className="modal-discount">{getDiscount(selectedProduct.old_price, selectedProduct.price)}%</span>
-                ) : null}
-                {selectedProduct.badge ? <span className="modal-badge">{selectedProduct.badge}</span> : null}
-              </div>
-            </div>
-            <div className="modal-grid">
-              <p className="modal-row"><span>Категория</span><strong>{selectedProduct.category || '-'}</strong></p>
-              <p className="modal-row"><span>Трафик</span><strong>{selectedProduct.data_gb ?? '-'} GB</strong></p>
-            </div>
-            <div className="modal-description">
-              <p className="modal-description-title">Описание</p>
-              <p>{selectedProduct.description || 'Описание пока не добавлено.'}</p>
-            </div>
-          </section>
-        </div>
-      ) : null}
     </main>
   )
 }
