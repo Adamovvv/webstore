@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import QRCode from 'qrcode'
 import { supabase } from '../lib/supabaseClient'
 
-const categories = ['All', 'eSIM', 'Travel', 'Local', 'Unlimited']
+const categories = ['Все', 'Мегафон', 'Билайн', 'Мтс', 'Йота']
 
 function formatPrice(value) {
   if (value == null) return ''
@@ -93,9 +93,8 @@ export default function StorePage() {
     <main className="mobile-store">
       <section className="phone-shell">
         <header className="hero">
-          <p className="muted">Discover</p>
           <div className="title-row">
-            <h1>SIM &amp; Data Plans</h1>
+            <h1>Красивые номера &amp; Выгодные тарифы</h1>
             <button className="icon-btn" aria-label="Notifications">??</button>
           </div>
           <div className="search-row">
@@ -103,7 +102,7 @@ export default function StorePage() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search plans or providers..."
+              placeholder="Поиск тарифа или оператора..."
             />
           </div>
           <div className="chips">
@@ -141,7 +140,7 @@ export default function StorePage() {
                   <div className="card-body">
                     <p className="provider">{item.provider}</p>
                     <h3>{item.title}</h3>
-                    <p className="meta">{item.duration_days} days � {item.data_gb} GB</p>
+                    <p className="meta">{item.duration_days} days � {item.data_gb} GB</p>
                     <div className="price-row">
                       <strong>?{formatPrice(item.price)}</strong>
                       {item.old_price ? <span className="old-price">?{formatPrice(item.old_price)}</span> : null}
