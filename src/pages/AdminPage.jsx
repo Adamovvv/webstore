@@ -4,13 +4,13 @@ import { supabase } from '../lib/supabaseClient'
 const initialForm = {
   title: '',
   provider: '',
-  category: 'eSIM',
+  category: 'Мегафон',
   image_url: '',
   badge: '',
-  data_gb: 10,
-  duration_days: 30,
-  price: 499,
-  old_price: 699,
+  data_gb: '',
+  duration_days: '',
+  price: '',
+  old_price: '',
 }
 
 export default function AdminPage() {
@@ -185,10 +185,10 @@ export default function AdminPage() {
           <input name="title" value={form.title} onChange={handleChange} placeholder="Product title" required />
           <input name="provider" value={form.provider} onChange={handleChange} placeholder="Provider" required />
           <select name="category" value={form.category} onChange={handleChange}>
-            <option value="eSIM">eSIM</option>
-            <option value="Travel">Travel</option>
-            <option value="Local">Local</option>
-            <option value="Unlimited">Unlimited</option>
+            <option value="megafon">Мегафон</option>
+            <option value="beeline">Билайн</option>
+            <option value="mts">Мтс</option>
+            <option value="yota">Йота</option>
           </select>
           <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
