@@ -38,8 +38,11 @@ select {
   min-height: 90vh;
   background: var(--card-bg);
   border-radius: 34px;
-  padding: 20px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+.hero {
+  padding: 16px;
 }
 
 .hero .muted {
@@ -61,14 +64,6 @@ select {
   line-height: 1.1;
 }
 
-.icon-btn {
-  border: 0;
-  border-radius: 12px;
-  width: 42px;
-  height: 42px;
-  background: #eceef6;
-}
-
 .search-row input {
   width: 100%;
   border: 0;
@@ -77,17 +72,25 @@ select {
   padding: 12px 14px;
 }
 
+.search-row input:focus,
+.search-row input:focus-visible {
+  background: #fff;
+  border: 1px solid #d6dce7;
+  outline: none;
+}
+
 .chips {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
-  margin-top: 14px;
-  padding-bottom: 2px;
+  scrollbar-width: none;
+  padding-left: 16px;
 }
 
 .chip {
-  border: 0;
-  padding: 10px 14px;
+  border: none;
+  height: 34px;
+  padding: 0 14px;
   border-radius: 999px;
   background: #eceef6;
   color: #676d87;
@@ -95,12 +98,12 @@ select {
 }
 
 .chip.active {
-  background: var(--primary);
+  background: linear-gradient(135deg,#2563eb,#0ea5e9);
   color: #fff;
 }
 
 .products-section {
-  margin-top: 18px;
+  padding: 16px;
 }
 
 .section-head {
@@ -112,14 +115,6 @@ select {
 .section-head h2 {
   margin: 0;
   font-size: 20px;
-}
-
-.sort-pill {
-  background: #eceef6;
-  padding: 6px 12px;
-  border-radius: 999px;
-  color: #5f6580;
-  font-size: 13px;
 }
 
 .grid {
@@ -263,18 +258,17 @@ select {
 
 .admin-page {
   min-height: 100vh;
-  padding: 24px;
+  padding: 16px;
   background: linear-gradient(120deg, #e5ecff 0%, #f8fbff 40%, #e6f8ee 100%);
 }
 
 .admin-shell {
-  max-width: 1060px;
   margin: 0 auto;
   background: #ffffffc4;
   border: 1px solid #d8deef;
   backdrop-filter: blur(8px);
   border-radius: 20px;
-  padding: 22px;
+  padding: 16px;
 }
 
 .admin-header h1 {
@@ -369,7 +363,6 @@ td {
     border-radius: 0;
     min-height: 100vh;
     width: 100vw;
-    padding: 16px;
   }
 
   .title-row h1 {

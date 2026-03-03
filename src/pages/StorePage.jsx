@@ -18,7 +18,7 @@ export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
-  const [activeCategory, setActiveCategory] = useState('All')
+  const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
@@ -51,7 +51,7 @@ export default function StorePage() {
   useEffect(() => {
     let next = [...products]
 
-    if (activeCategory !== 'All') {
+    if (activeCategory !== 'Все') {
       next = next.filter((item) => item.category === activeCategory)
     }
 
@@ -95,7 +95,6 @@ export default function StorePage() {
         <header className="hero">
           <div className="title-row">
             <h1>Красивые номера &amp; Выгодные тарифы</h1>
-            <button className="icon-btn" aria-label="Notifications">??</button>
           </div>
           <div className="search-row">
             <input
@@ -105,7 +104,9 @@ export default function StorePage() {
               placeholder="Поиск тарифа или оператора..."
             />
           </div>
-          <div className="chips">
+        </header>
+
+        <div className="chips">
             {categories.map((category) => (
               <button
                 key={category}
@@ -116,12 +117,10 @@ export default function StorePage() {
               </button>
             ))}
           </div>
-        </header>
 
         <section className="products-section">
           <div className="section-head">
-            <h2>{loading ? 'Loading...' : `${filtered.length} Plans`}</h2>
-            <span className="sort-pill">Popularity</span>
+            <h2>{loading ? 'Loading...' : `${filtered.length} Товаров`}</h2>
           </div>
 
           <div className="grid">
