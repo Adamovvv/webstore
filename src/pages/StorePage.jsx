@@ -20,7 +20,6 @@ export default function StorePage() {
   const [filtered, setFiltered] = useState([])
   const [adImageUrl, setAdImageUrl] = useState('')
   const [openedProductId, setOpenedProductId] = useState(null)
-  const [hasAutoOpened, setHasAutoOpened] = useState(false)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
@@ -78,13 +77,6 @@ export default function StorePage() {
 
     setFiltered(next)
   }, [products, activeCategory, search])
-
-  useEffect(() => {
-    if (!hasAutoOpened && filtered.length > 0) {
-      setOpenedProductId(filtered[0].id)
-      setHasAutoOpened(true)
-    }
-  }, [filtered, hasAutoOpened])
 
   const appUrl = useMemo(() => {
     return import.meta.env.VITE_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : '')
