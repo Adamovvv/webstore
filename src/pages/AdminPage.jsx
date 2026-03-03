@@ -8,7 +8,6 @@ const initialForm = {
   image_url: '',
   badge: '',
   data_gb: '',
-  duration_days: '',
   price: '',
   old_price: '',
 }
@@ -61,7 +60,7 @@ export default function AdminPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target
-    setForm((prev) => ({ ...prev, [name]: name.includes('price') || name.includes('days') || name.includes('gb') ? Number(value) : value }))
+    setForm((prev) => ({ ...prev, [name]: name.includes('price') || name.includes('gb') ? Number(value) : value }))
   }
 
   const handleCreds = (event) => {
@@ -124,7 +123,6 @@ export default function AdminPage() {
       image_url: item.image_url || '',
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
-      duration_days: item.duration_days ?? 0,
       price: item.price ?? 0,
       old_price: item.old_price ?? 0,
     })
@@ -193,7 +191,6 @@ export default function AdminPage() {
           <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
           <input type="number" name="data_gb" value={form.data_gb} onChange={handleChange} placeholder="Data (GB)" required />
-          <input type="number" name="duration_days" value={form.duration_days} onChange={handleChange} placeholder="Duration (days)" required />
           <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="Price" required />
           <input type="number" name="old_price" value={form.old_price} onChange={handleChange} placeholder="Old price" />
 
@@ -239,3 +236,4 @@ export default function AdminPage() {
     </main>
   )
 }
+

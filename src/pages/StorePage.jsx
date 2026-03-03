@@ -140,7 +140,7 @@ export default function StorePage() {
                   <div className="card-body">
                     <p className="provider">{item.provider}</p>
                     <h3>{item.title}</h3>
-                    <p className="meta">{item.duration_days} days � {item.data_gb} GB</p>
+                    <p className="meta">{item.data_gb} GB</p>
                     <div className="price-row">
                       <strong>?{formatPrice(item.price)}</strong>
                       {item.old_price ? <span className="old-price">?{formatPrice(item.old_price)}</span> : null}
@@ -158,3 +158,6 @@ export default function StorePage() {
     </main>
   )
 }
+
+
+
