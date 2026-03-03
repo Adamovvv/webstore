@@ -6,11 +6,14 @@ create table if not exists public.products (
   provider text not null,
   category text not null default 'eSIM',
   image_url text,
+  description text,
   badge text,
   data_gb integer not null check (data_gb >= 0),
   price integer not null check (price >= 0),
   old_price integer
 );
+
+alter table public.products add column if not exists description text;
 
 alter table public.products enable row level security;
 

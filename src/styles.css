@@ -386,6 +386,27 @@ select {
   text-align: right;
 }
 
+.modal-description {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f3f6ff;
+}
+
+.modal-description-title {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #5e6788;
+}
+
+.modal-description p {
+  margin: 8px 0 0;
+  color: #2a3152;
+  line-height: 1.45;
+}
+
 .desktop-gate {
   min-height: 100vh;
   display: grid;
@@ -458,11 +479,18 @@ select {
 }
 
 .admin-form input,
-.admin-form select {
+.admin-form select,
+.admin-form textarea {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px;
   background: #fff;
+}
+
+.admin-form textarea {
+  grid-column: 1 / -1;
+  resize: vertical;
+  min-height: 90px;
 }
 
 .admin-actions {

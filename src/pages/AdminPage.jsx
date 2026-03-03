@@ -6,6 +6,7 @@ const initialForm = {
   provider: '',
   category: 'Мегафон',
   image_url: '',
+  description: '',
   badge: '',
   data_gb: '',
   price: '',
@@ -115,6 +116,7 @@ export default function AdminPage() {
 
     const payload = {
       ...form,
+      description: form.description || null,
       old_price: form.old_price || null,
       badge: form.badge || null,
       image_url: form.image_url || null,
@@ -140,6 +142,7 @@ export default function AdminPage() {
       provider: item.provider || '',
       category: item.category || 'eSIM',
       image_url: item.image_url || '',
+      description: item.description || '',
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
       price: item.price ?? 0,
@@ -241,6 +244,13 @@ export default function AdminPage() {
             <option value="mts">Мтс</option>
             <option value="yota">Йота</option>
           </select>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Описание товара"
+            rows={4}
+          />
           <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
           <input type="number" name="data_gb" value={form.data_gb} onChange={handleChange} placeholder="Data (GB)" required />

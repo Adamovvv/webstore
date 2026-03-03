@@ -218,8 +218,10 @@ export default function StorePage() {
             <div className="modal-grid">
               <p className="modal-row"><span>Категория</span><strong>{selectedProduct.category || '-'}</strong></p>
               <p className="modal-row"><span>Трафик</span><strong>{selectedProduct.data_gb ?? '-'} GB</strong></p>
-              <p className="modal-row"><span>ID</span><strong>{selectedProduct.id || '-'}</strong></p>
-              <p className="modal-row"><span>Добавлен</span><strong>{selectedProduct.created_at ? new Date(selectedProduct.created_at).toLocaleString('ru-RU') : '-'}</strong></p>
+            </div>
+            <div className="modal-description">
+              <p className="modal-description-title">Описание</p>
+              <p>{selectedProduct.description || 'Описание пока не добавлено.'}</p>
             </div>
           </section>
         </div>
