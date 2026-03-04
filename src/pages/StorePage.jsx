@@ -65,6 +65,8 @@ export default function StorePage() {
   const whatsappNumber = '79280013099'
   const whatsappLabel = formatWhatsappLabel(whatsappNumber)
   const whatsappHref = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
+  const loadingCards = [1, 2, 3, 4]
+  const loadingFaq = [1, 2, 3]
 
   useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth > 768)
@@ -173,7 +175,8 @@ export default function StorePage() {
               />
             </div>
           </div>
-          {adImageUrl ? (
+          {loading && !adImageUrl ? <div className="ad-banner skeleton-box banner-skeleton" /> : null}
+          {!loading && adImageUrl ? (
             <a className="ad-banner" href={adImageUrl} target="_blank" rel="noreferrer">
               <img src={adImageUrl} alt="Рекламный баннер" />
             </a>
@@ -181,27 +184,48 @@ export default function StorePage() {
         </header>
 
         <div className="chips">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={category === activeCategory ? 'chip active' : 'chip'}
-                onClick={() => setActiveCategory(category)}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          {loading
+            ? [1, 2, 3, 4].map((item) => <div key={item} className="chip chip-skeleton skeleton-box" />)
+            : categories.map((category) => (
+                <button
+                  key={category}
+                  className={category === activeCategory ? 'chip active' : 'chip'}
+                  onClick={() => setActiveCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+        </div>
 
         <section className="products-section">
           <div className="section-head">
-            <h2>{loading ? 'Loading...' : 'Доступные тарифы'}</h2>
+            <h2>Доступные тарифы</h2>
           </div>
 
-          <div className="products-list">
-            {filtered.map((item) => {
-              const discount = getDiscount(item.old_price, item.price)
-              const isOpen = openedProductId === item.id
-              return (
+          {loading ? (
+            <div className="products-list">
+              {loadingCards.map((item) => (
+                <article key={item} className="list-card">
+                  <div className="list-card-main">
+                    <div className="skeleton-col">
+                      <div className="skeleton-box skeleton-text-xs" />
+                      <div className="skeleton-box skeleton-text-lg" />
+                      <div className="skeleton-box skeleton-text-sm" />
+                    </div>
+                    <div className="skeleton-col-right">
+                      <div className="skeleton-box skeleton-text-md" />
+                      <div className="skeleton-box skeleton-text-xs" />
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="products-list">
+              {filtered.map((item) => {
+                const discount = getDiscount(item.old_price, item.price)
+                const isOpen = openedProductId === item.id
+                return (
                 <article
                   key={item.id}
                   className={isOpen ? 'list-card open' : 'list-card'}
@@ -236,33 +260,57 @@ export default function StorePage() {
                 </article>
               )
             })}
-          </div>
+            </div>
+          )}
 
           {!loading && filtered.length === 0 ? <p className="empty">No products found. Add items in the admin panel.</p> : null}
         </section>
 
         <section className="why-us">
           <h2>Почему выбирают нас?</h2>
-          <div className="why-us-list">
-            <article className="why-card">
-              <h3>⚡ Подключение в день обращения</h3>
-              <p>Подбираем тариф и запускаем подключение без долгих ожиданий.</p>
-            </article>
-            <article className="why-card">
-              <h3>🛡️ Честные условия</h3>
-              <p>Показываем все платежи заранее, без скрытых списаний и сюрпризов.</p>
-            </article>
-            <article className="why-card">
-              <h3>💬 Поддержка в WhatsApp</h3>
-              <p>Быстро отвечаем по тарифам, подключению и вопросам после покупки.</p>
-            </article>
-          </div>
+          {loading ? (
+            <div className="why-us-list">
+              {[1, 2, 3].map((item) => (
+                <article key={item} className="why-card">
+                  <div className="skeleton-box skeleton-text-lg" />
+                  <div className="skeleton-box skeleton-text-sm" />
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="why-us-list">
+              <article className="why-card">
+                <h3>⚡ Подключение в день обращения</h3>
+                <p>Подбираем тариф и запускаем подключение без долгих ожиданий.</p>
+              </article>
+              <article className="why-card">
+                <h3>🛡️ Честные условия</h3>
+                <p>Показываем все платежи заранее, без скрытых списаний и сюрпризов.</p>
+              </article>
+              <article className="why-card">
+                <h3>💬 Поддержка в WhatsApp</h3>
+                <p>Быстро отвечаем по тарифам, подключению и вопросам после покупки.</p>
+              </article>
+            </div>
+          )}
         </section>
 
         <section className="faq-section">
           <h2>FAQ</h2>
-          <div className="faq-list">
-            {faqItems.map((item, index) => {
+          {loading ? (
+            <div className="faq-list">
+              {loadingFaq.map((item) => (
+                <article key={item} className="faq-item">
+                  <div className="faq-question">
+                    <div className="skeleton-box skeleton-text-md" />
+                    <div className="skeleton-box skeleton-circle" />
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="faq-list">
+              {faqItems.map((item, index) => {
               const isOpen = activeFaqIndex === index
               return (
                 <article key={item.question} className={isOpen ? 'faq-item open' : 'faq-item'}>
@@ -281,7 +329,8 @@ export default function StorePage() {
                 </article>
               )
             })}
-          </div>
+            </div>
+          )}
         </section>
       </section>
     </main>

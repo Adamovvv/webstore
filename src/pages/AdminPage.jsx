@@ -216,8 +216,15 @@ export default function AdminPage() {
   if (authLoading && !session) {
     return (
       <main className="admin-page">
-        <section className="admin-shell">
-          <p>Loading...</p>
+        <section className="admin-shell admin-shell-skeleton">
+          <div className="skeleton-box skeleton-text-xl" />
+          <div className="skeleton-box skeleton-text-md" />
+          <div className="admin-form">
+            <div className="skeleton-box skeleton-input" />
+            <div className="skeleton-box skeleton-input" />
+            <div className="skeleton-box skeleton-input" />
+            <div className="skeleton-box skeleton-input" />
+          </div>
         </section>
       </main>
     )
@@ -316,7 +323,6 @@ export default function AdminPage() {
 
         <section className="admin-list">
           <h2>Products</h2>
-          {loading ? <p>Loading...</p> : null}
           {!loading && products.length === 0 ? <p>No products yet.</p> : null}
           <div className="table-wrap">
             <table>
@@ -330,18 +336,28 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.title}</td>
-                    <td>{item.provider}</td>
-                    <td>{item.category}</td>
-                    <td>{item.monthly_payment ?? item.price} ₽</td>
-                    <td className="row-actions">
-                      <button type="button" onClick={() => onEdit(item)}>Edit</button>
-                      <button type="button" onClick={() => onDelete(item.id)} className="danger">Delete</button>
-                    </td>
-                  </tr>
-                ))}
+                {loading
+                  ? [1, 2, 3, 4].map((row) => (
+                      <tr key={row}>
+                        <td><div className="skeleton-box skeleton-text-md" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-md" /></td>
+                      </tr>
+                    ))
+                  : products.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.title}</td>
+                        <td>{item.provider}</td>
+                        <td>{item.category}</td>
+                        <td>{item.monthly_payment ?? item.price} ₽</td>
+                        <td className="row-actions">
+                          <button type="button" onClick={() => onEdit(item)}>Edit</button>
+                          <button type="button" onClick={() => onDelete(item.id)} className="danger">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

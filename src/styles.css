@@ -21,6 +21,36 @@ body {
   min-height: 100vh;
 }
 
+.skeleton-box {
+  position: relative;
+  overflow: hidden;
+  background: #e9edf7;
+  border-radius: 10px;
+}
+
+.skeleton-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+  animation: skeleton-shimmer 1.25s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-text-xs { height: 10px; width: 72px; }
+.skeleton-text-sm { height: 12px; width: 110px; }
+.skeleton-text-md { height: 14px; width: 150px; }
+.skeleton-text-lg { height: 18px; width: 210px; }
+.skeleton-text-xl { height: 28px; width: 240px; border-radius: 14px; }
+.skeleton-input { height: 42px; width: 100%; border-radius: 10px; }
+.skeleton-circle { width: 18px; height: 18px; border-radius: 50%; }
+
 button,
 input,
 select {
@@ -136,6 +166,10 @@ select {
   overflow: hidden;
 }
 
+.banner-skeleton {
+  height: 130px;
+}
+
 .ad-banner img {
   width: 100%;
   height: auto;
@@ -164,6 +198,10 @@ select {
 .chip.active {
   background: linear-gradient(135deg,#2563eb,#0ea5e9);
   color: #fff;
+}
+
+.chip-skeleton {
+  min-width: 90px;
 }
 
 .products-section {
@@ -209,6 +247,17 @@ select {
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
+}
+
+.skeleton-col {
+  display: grid;
+  gap: 8px;
+}
+
+.skeleton-col-right {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
 }
 
 .list-card-main:focus-visible {
@@ -449,6 +498,10 @@ select {
   backdrop-filter: blur(8px);
   border-radius: 20px;
   padding: 16px;
+}
+
+.admin-shell-skeleton .admin-form {
+  margin-top: 16px;
 }
 
 .admin-header h1 {
