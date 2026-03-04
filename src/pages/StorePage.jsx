@@ -213,9 +213,9 @@ export default function StorePage() {
                     aria-expanded={isOpen}
                   >
                     <div>
-                      <p className="provider">{item.badge || '—'}</p>
+                      <p className="metka">{item.badge || '—'}</p>
                       <h3>{item.title}</h3>
-                      <p className="meta">{item.provider || '—'}</p>
+                      <p className="provider">{item.provider || '—'}</p>
                     </div>
                     <div className="list-price-col">
                       <strong>{item.price != null ? `${formatPrice(item.price)} ₽` : '-'}</strong>

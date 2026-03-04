@@ -246,10 +246,13 @@ select {
   line-height: 1.25;
 }
 
-.meta {
+.metka {
   margin: 0;
   color: #73798e;
   font-size: 12px;
+  background: #def8ef;
+  padding: 3px 6px;
+  border-radius: 999px;
 }
 
 .old-price {
