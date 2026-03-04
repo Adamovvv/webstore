@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 const initialForm = {
   title: '',
   provider: '',
-  category: 'Megafon',
+  category: 'megafon',
   is_unlimited: false,
   badge: '',
   data_gb: '',
