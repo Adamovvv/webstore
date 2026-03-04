@@ -32,6 +32,25 @@ function formatWhatsappLabel(value) {
   return `+${digits}`
 }
 
+const faqItems = [
+  {
+    question: 'Как быстро подключается тариф?',
+    answer: 'Обычно подключение занимает от 5 до 15 минут после подтверждения заявки.',
+  },
+  {
+    question: 'Можно ли сохранить текущий номер?',
+    answer: 'Да, вы можете выбрать тариф с переносом номера. Мы подскажем шаги при оформлении.',
+  },
+  {
+    question: 'Есть ли безлимитный интернет?',
+    answer: 'Да, в каталоге есть тарифы с безлимитным интернетом. Они помечены в карточке.',
+  },
+  {
+    question: 'Как связаться с менеджером?',
+    answer: 'Нажмите на WhatsApp вверху страницы и напишите нам, ответим в рабочее время.',
+  },
+]
+
 export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
@@ -40,6 +59,7 @@ export default function StorePage() {
   const [openedProductId, setOpenedProductId] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
+  const [activeFaqIndex, setActiveFaqIndex] = useState(null)
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
   const whatsappNumber = '79280013099'
@@ -219,6 +239,49 @@ export default function StorePage() {
           </div>
 
           {!loading && filtered.length === 0 ? <p className="empty">No products found. Add items in the admin panel.</p> : null}
+        </section>
+
+        <section className="why-us">
+          <h2>Почему выбирают нас?</h2>
+          <div className="why-us-list">
+            <article className="why-card">
+              <h3>Подключение в день обращения</h3>
+              <p>Подбираем тариф и запускаем подключение без долгих ожиданий.</p>
+            </article>
+            <article className="why-card">
+              <h3>Честные условия</h3>
+              <p>Показываем все платежи заранее, без скрытых списаний и сюрпризов.</p>
+            </article>
+            <article className="why-card">
+              <h3>Поддержка в WhatsApp</h3>
+              <p>Быстро отвечаем по тарифам, подключению и вопросам после покупки.</p>
+            </article>
+          </div>
+        </section>
+
+        <section className="faq-section">
+          <h2>FAQ</h2>
+          <div className="faq-list">
+            {faqItems.map((item, index) => {
+              const isOpen = activeFaqIndex === index
+              return (
+                <article key={item.question} className={isOpen ? 'faq-item open' : 'faq-item'}>
+                  <button
+                    type="button"
+                    className="faq-question"
+                    aria-expanded={isOpen}
+                    onClick={() => setActiveFaqIndex(isOpen ? null : index)}
+                  >
+                    <span>{item.question}</span>
+                    <span>{isOpen ? '−' : '+'}</span>
+                  </button>
+                  <div className={isOpen ? 'faq-answer open' : 'faq-answer'}>
+                    <p>{item.answer}</p>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
         </section>
       </section>
     </main>
