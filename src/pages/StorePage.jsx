@@ -32,8 +32,8 @@ function getMonthlyPayment(item) {
 
 function getProviderKey(value) {
   const next = String(value || '').trim().toLowerCase()
-  if (next.includes('mega') || next.includes('мега')) return 'megafon'
-  if (next.includes('bee') || next.includes('била')) return 'beeline'
+  if (next.includes('megafon') || next.includes('мегафон')) return 'megafon'
+  if (next.includes('beeline') || next.includes('билайн')) return 'beeline'
   if (next === 'mts' || next.includes('мтс')) return 'mts'
   if (next.includes('yota') || next.includes('йота')) return 'yota'
   return ''
