@@ -178,6 +178,7 @@ select {
 
 .ad-carousel-wrap {
   margin-top: 16px;
+  overflow: hidden;
 }
 
 .ad-carousel-scroll {
@@ -186,7 +187,8 @@ select {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  padding-right: 28px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
 .ad-carousel-scroll::-webkit-scrollbar {
@@ -194,7 +196,7 @@ select {
 }
 
 .ad-slide {
-  flex: 0 0 calc(100% - 30px);
+  flex: 0 0 calc(100% - 52px);
   scroll-snap-align: start;
   margin-top: 0;
 }
