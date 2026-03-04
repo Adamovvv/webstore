@@ -207,33 +207,32 @@ export default function StorePage() {
               />
             </div>
           </div>
-        </header>
-
-        {loading ? <div className="ad-banner skeleton-box banner-skeleton" /> : null}
-        {!loading && adBanners.length > 0 ? (
-          <div className="ad-carousel-wrap">
-            <div className="ad-carousel-scroll" ref={carouselRef}>
-              {adBanners.map((url, index) => (
-                <a key={`${url}-${index}`} className="ad-banner ad-slide" href={url} target="_blank" rel="noreferrer">
-                  <img src={url} alt={`Рекламный баннер ${index + 1}`} />
-                </a>
-              ))}
-            </div>
-            {adBanners.length > 1 ? (
-              <div className="ad-dots">
-                {adBanners.map((_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className={index === activeBannerIndex ? 'ad-dot active' : 'ad-dot'}
-                    onClick={() => setActiveBannerIndex(index)}
-                    aria-label={`Баннер ${index + 1}`}
-                  />
+          {loading ? <div className="ad-banner skeleton-box banner-skeleton" /> : null}
+          {!loading && adBanners.length > 0 ? (
+            <div className="ad-carousel-wrap">
+              <div className="ad-carousel-scroll" ref={carouselRef}>
+                {adBanners.map((url, index) => (
+                  <a key={`${url}-${index}`} className="ad-banner ad-slide" href={url} target="_blank" rel="noreferrer">
+                    <img src={url} alt={`Рекламный баннер ${index + 1}`} />
+                  </a>
                 ))}
               </div>
-            ) : null}
-          </div>
-        ) : null}
+              {adBanners.length > 1 ? (
+                <div className="ad-dots">
+                  {adBanners.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={index === activeBannerIndex ? 'ad-dot active' : 'ad-dot'}
+                      onClick={() => setActiveBannerIndex(index)}
+                      aria-label={`Баннер ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </header>
 
         <div className="chips">
           {loading
