@@ -213,7 +213,7 @@ export default function StorePage() {
                     aria-expanded={isOpen}
                   >
                     <div>
-                      <p className="provider">Метка: {item.badge || '—'}</p>
+                      <p className="provider">{item.badge || '—'}</p>
                       <h3>{item.title}</h3>
                       <p className="meta">{item.provider || '—'}</p>
                     </div>
