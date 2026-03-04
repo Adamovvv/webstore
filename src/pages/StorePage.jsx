@@ -245,15 +245,15 @@ export default function StorePage() {
           <h2>Почему выбирают нас?</h2>
           <div className="why-us-list">
             <article className="why-card">
-              <h3>Подключение в день обращения</h3>
+              <h3>⚡ Подключение в день обращения</h3>
               <p>Подбираем тариф и запускаем подключение без долгих ожиданий.</p>
             </article>
             <article className="why-card">
-              <h3>Честные условия</h3>
+              <h3>🛡️ Честные условия</h3>
               <p>Показываем все платежи заранее, без скрытых списаний и сюрпризов.</p>
             </article>
             <article className="why-card">
-              <h3>Поддержка в WhatsApp</h3>
+              <h3>💬 Поддержка в WhatsApp</h3>
               <p>Быстро отвечаем по тарифам, подключению и вопросам после покупки.</p>
             </article>
           </div>

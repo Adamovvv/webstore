@@ -17,7 +17,7 @@
 body {
   margin: 0;
   color: var(--ink);
-  background: radial-gradient(circle at 10% 0%, #ff7a7a 0%, #7055ff 40%, #008245 100%);
+  background: var(--card-bg);
   min-height: 100vh;
 }
 
@@ -36,7 +36,6 @@ select {
 .phone-shell {
   width: min(100vw, 420px);
   min-height: 90vh;
-  background: var(--card-bg);
   border-radius: 34px;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
 }
