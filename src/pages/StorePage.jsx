@@ -40,10 +40,10 @@ function getProviderKey(value) {
 }
 
 const providerLogos = {
-  megafon: '/provider-logos/megafon.svg',
-  beeline: '/provider-logos/beeline.svg',
-  mts: '/provider-logos/mts.svg',
-  yota: '/provider-logos/yota.svg',
+  megafon: '/provider-logos/megafon.png',
+  beeline: '/provider-logos/beeline.png',
+  mts: '/provider-logos/mts.png',
+  yota: '/provider-logos/yota.png',
 }
 
 function formatWhatsappLabel(value) {
