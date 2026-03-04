@@ -178,6 +178,7 @@ select {
 
 .ad-carousel-wrap {
   margin-top: 16px;
+  padding-left: 16px;
   overflow: hidden;
 }
 
@@ -187,7 +188,6 @@ select {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  padding-left: 16px;
   padding-right: 16px;
 }
 
