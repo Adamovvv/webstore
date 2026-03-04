@@ -183,7 +183,7 @@ select {
 
 .ad-carousel-scroll {
   display: flex;
-  gap: 0;
+  gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;

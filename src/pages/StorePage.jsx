@@ -152,7 +152,7 @@ export default function StorePage() {
     if (adBanners.length <= 1) return
     const timer = setInterval(() => {
       setActiveBannerIndex((prev) => (prev + 1) % adBanners.length)
-    }, 3000)
+    }, 5000)
     return () => clearInterval(timer)
   }, [adBanners.length])
 
