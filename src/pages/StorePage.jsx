@@ -179,8 +179,7 @@ export default function StorePage() {
 
           <div className="products-list">
             {filtered.map((item) => {
-              const currentPayment = item.monthly_payment ?? item.price
-              const discount = getDiscount(item.old_price, currentPayment)
+              const discount = getDiscount(item.old_price, item.price)
               const isOpen = openedProductId === item.id
               return (
                 <article
@@ -199,7 +198,7 @@ export default function StorePage() {
                       <p className="meta">{getTrafficLabel(item)}</p>
                     </div>
                     <div className="list-price-col">
-                      <strong>{getMonthlyPayment(item)}</strong>
+                      <strong>{item.price != null ? `${formatPrice(item.price)} ₽` : '-'}</strong>
                       {item.old_price ? <span className="old-price">{formatPrice(item.old_price)} ₽</span> : null}
                       {discount ? <span className="discount">{discount}% скидка</span> : null}
                       <span className="list-toggle">{isOpen ? 'Свернуть ▲' : 'Подробнее ▼'}</span>

@@ -9,6 +9,7 @@ const initialForm = {
   is_unlimited: false,
   badge: '',
   data_gb: '',
+  price: '',
   minutes: '',
   sms: '',
   monthly_payment: '',
@@ -123,10 +124,10 @@ export default function AdminPage() {
       ...form,
       is_unlimited: !!form.is_unlimited,
       data_gb: form.is_unlimited ? 0 : Number(form.data_gb),
+      price: Number(form.price) || 0,
       minutes: Number(form.minutes) || 0,
       sms: Number(form.sms) || 0,
       monthly_payment: Number(form.monthly_payment) || 0,
-      price: Number(form.monthly_payment) || 0,
       old_price: form.old_price || null,
       badge: form.badge || null,
       image_url: form.image_url || null,
@@ -155,6 +156,7 @@ export default function AdminPage() {
       is_unlimited: item.is_unlimited ?? false,
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
+      price: item.price ?? 0,
       minutes: item.minutes ?? 0,
       sms: item.sms ?? 0,
       monthly_payment: item.monthly_payment ?? item.price ?? 0,
@@ -280,6 +282,7 @@ export default function AdminPage() {
             required={!form.is_unlimited}
             disabled={!!form.is_unlimited}
           />
+          <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="Прайс" required />
           <input
             type="number"
             name="monthly_payment"
