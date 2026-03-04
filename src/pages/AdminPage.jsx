@@ -21,12 +21,13 @@ export default function AdminPage() {
   const [authLoading, setAuthLoading] = useState(true)
 
   const [products, setProducts] = useState([])
-  const [adImageUrl, setAdImageUrl] = useState('')
+  const [adBanners, setAdBanners] = useState([])
   const [form, setForm] = useState(initialForm)
   const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [adUploading, setAdUploading] = useState(false)
+  const [bannerUploading, setBannerUploading] = useState({})
   const [adSaving, setAdSaving] = useState(false)
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function AdminPage() {
   const fetchStoreSettings = async () => {
     const { data, error } = await supabase
       .from('store_settings')
-      .select('ad_image_url')
+      .select('ad_image_url, ad_banners')
       .eq('id', 1)
       .maybeSingle()
 
@@ -70,7 +71,19 @@ export default function AdminPage() {
       return
     }
 
-    setAdImageUrl(data?.ad_image_url || '')
+    const nextBanners = Array.isArray(data?.ad_banners)
+      ? data.ad_banners
+      : data?.ad_image_url
+        ? [data.ad_image_url]
+        : []
+    const normalized = nextBanners
+      .map((item, index) => ({
+        id: typeof item === 'object' && item?.id ? item.id : `banner-${index}-${Date.now()}`,
+        url: typeof item === 'string' ? item : item?.url || '',
+      }))
+      .filter((item) => item.url)
+
+    setAdBanners(normalized.length > 0 ? normalized : [{ id: `banner-${Date.now()}`, url: '' }])
   }
 
   useEffect(() => {
@@ -172,7 +185,33 @@ export default function AdminPage() {
     await fetchProducts()
   }
 
-  const onAdFileChange = async (event) => {
+  const updateBannerUrl = (id, value) => {
+    setAdBanners((prev) => prev.map((item) => (item.id === id ? { ...item, url: value } : item)))
+  }
+
+  const addBanner = () => {
+    setAdBanners((prev) => [...prev, { id: `banner-${Date.now()}`, url: '' }])
+  }
+
+  const removeBanner = (id) => {
+    setAdBanners((prev) => prev.filter((item) => item.id !== id))
+  }
+
+  const moveBanner = (id, direction) => {
+    setAdBanners((prev) => {
+      const index = prev.findIndex((item) => item.id === id)
+      if (index < 0) return prev
+      const target = direction === 'up' ? index - 1 : index + 1
+      if (target < 0 || target >= prev.length) return prev
+      const next = [...prev]
+      const current = next[index]
+      next[index] = next[target]
+      next[target] = current
+      return next
+    })
+  }
+
+  const onAdFileChange = async (event, id) => {
     const file = event.target.files?.[0]
     if (!file) return
     if (!session?.user) {
@@ -181,6 +220,7 @@ export default function AdminPage() {
     }
 
     setAdUploading(true)
+    setBannerUploading((prev) => ({ ...prev, [id]: true }))
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'png'
     const path = `ads/${Date.now()}-${crypto.randomUUID()}.${fileExt}`
     const { error: uploadError } = await supabase.storage.from('store-assets').upload(path, file, {
@@ -191,24 +231,27 @@ export default function AdminPage() {
     if (uploadError) {
       alert(`Ошибка загрузки: ${uploadError.message}`)
       setAdUploading(false)
+      setBannerUploading((prev) => ({ ...prev, [id]: false }))
       return
     }
 
     const { data } = supabase.storage.from('store-assets').getPublicUrl(path)
-    setAdImageUrl(data.publicUrl)
+    updateBannerUrl(id, data.publicUrl)
     setAdUploading(false)
+    setBannerUploading((prev) => ({ ...prev, [id]: false }))
   }
 
-  const saveAdImage = async () => {
+  const saveAdBanners = async () => {
     setAdSaving(true)
+    const urls = adBanners.map((item) => item.url.trim()).filter(Boolean)
     const { error } = await supabase
       .from('store_settings')
-      .upsert({ id: 1, ad_image_url: adImageUrl || null }, { onConflict: 'id' })
+      .upsert({ id: 1, ad_image_url: urls[0] || null, ad_banners: urls }, { onConflict: 'id' })
 
     if (error) {
       alert(error.message)
     } else {
-      alert('Рекламный баннер сохранен')
+      alert('Баннеры сохранены')
     }
     setAdSaving(false)
   }
@@ -303,19 +346,40 @@ export default function AdminPage() {
         </form>
 
         <section className="admin-ad-settings">
-          <h2>Рекламный баннер</h2>
-          <p>Загрузите изображение или вставьте URL, затем сохраните.</p>
-          <div className="admin-form">
-            <input
-              type="url"
-              value={adImageUrl}
-              onChange={(event) => setAdImageUrl(event.target.value)}
-              placeholder="https://example.com/banner.jpg"
-            />
-            <input type="file" accept="image/*" onChange={onAdFileChange} />
+          <h2>Рекламные баннеры</h2>
+          <p>Добавляйте несколько баннеров, меняйте порядок и сохраняйте одним кликом.</p>
+          <div className="admin-banners-list">
+            {adBanners.map((item, index) => (
+              <article key={item.id} className="admin-banner-item">
+                <div className="admin-banner-head">
+                  <strong>Баннер #{index + 1}</strong>
+                  <div className="admin-banner-actions">
+                    <button type="button" onClick={() => moveBanner(item.id, 'up')} disabled={index === 0}>↑</button>
+                    <button type="button" onClick={() => moveBanner(item.id, 'down')} disabled={index === adBanners.length - 1}>↓</button>
+                    <button type="button" onClick={() => removeBanner(item.id)} className="danger">Удалить</button>
+                  </div>
+                </div>
+                <div className="admin-form">
+                  <input
+                    type="url"
+                    value={item.url}
+                    onChange={(event) => updateBannerUrl(item.id, event.target.value)}
+                    placeholder="https://example.com/banner.jpg"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => onAdFileChange(event, item.id)}
+                  />
+                </div>
+                {item.url ? <img src={item.url} alt={`Баннер ${index + 1}`} className="admin-banner-preview" /> : null}
+                {bannerUploading[item.id] ? <p className="muted">Uploading...</p> : null}
+              </article>
+            ))}
             <div className="admin-actions">
-              <button type="button" onClick={saveAdImage} disabled={adSaving || adUploading}>
-                {adUploading ? 'Uploading...' : adSaving ? 'Saving...' : 'Save banner'}
+              <button type="button" onClick={addBanner}>Добавить баннер</button>
+              <button type="button" onClick={saveAdBanners} disabled={adSaving || adUploading}>
+                {adSaving ? 'Saving...' : 'Сохранить баннеры'}
               </button>
             </div>
           </div>

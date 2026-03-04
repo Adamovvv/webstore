@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { supabase } from '../lib/supabaseClient'
 
@@ -55,13 +55,15 @@ export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
   const [filtered, setFiltered] = useState([])
-  const [adImageUrl, setAdImageUrl] = useState('')
+  const [adBanners, setAdBanners] = useState([])
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0)
   const [openedProductId, setOpenedProductId] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Все')
   const [search, setSearch] = useState('')
   const [activeFaqIndex, setActiveFaqIndex] = useState(null)
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
+  const carouselRef = useRef(null)
   const whatsappNumber = '79280013099'
   const whatsappLabel = formatWhatsappLabel(whatsappNumber)
   const whatsappHref = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
@@ -83,7 +85,7 @@ export default function StorePage() {
         .order('created_at', { ascending: false })
       const { data: settingsData, error: settingsError } = await supabase
         .from('store_settings')
-        .select('ad_image_url')
+        .select('ad_image_url, ad_banners')
         .eq('id', 1)
         .maybeSingle()
 
@@ -96,7 +98,15 @@ export default function StorePage() {
       if (settingsError) {
         console.error(settingsError)
       } else {
-        setAdImageUrl(settingsData?.ad_image_url || '')
+        const nextBanners = Array.isArray(settingsData?.ad_banners)
+          ? settingsData.ad_banners
+          : settingsData?.ad_image_url
+            ? [settingsData.ad_image_url]
+            : []
+        const normalized = nextBanners
+          .map((item) => (typeof item === 'string' ? item : item?.url))
+          .filter(Boolean)
+        setAdBanners(normalized)
       }
       setLoading(false)
     }
@@ -131,6 +141,28 @@ export default function StorePage() {
       .then((url) => setQrData(url))
       .catch((error) => console.error(error))
   }, [isDesktop, appUrl])
+
+  useEffect(() => {
+    if (activeBannerIndex >= adBanners.length) {
+      setActiveBannerIndex(0)
+    }
+  }, [adBanners, activeBannerIndex])
+
+  useEffect(() => {
+    if (adBanners.length <= 1) return
+    const timer = setInterval(() => {
+      setActiveBannerIndex((prev) => (prev + 1) % adBanners.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [adBanners.length])
+
+  useEffect(() => {
+    const node = carouselRef.current
+    if (!node) return
+    const slide = node.children[activeBannerIndex]
+    if (!slide) return
+    node.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' })
+  }, [activeBannerIndex])
 
   if (isDesktop) {
     return (
@@ -175,11 +207,30 @@ export default function StorePage() {
               />
             </div>
           </div>
-          {loading && !adImageUrl ? <div className="ad-banner skeleton-box banner-skeleton" /> : null}
-          {!loading && adImageUrl ? (
-            <a className="ad-banner" href={adImageUrl} target="_blank" rel="noreferrer">
-              <img src={adImageUrl} alt="Рекламный баннер" />
-            </a>
+          {loading ? <div className="ad-banner skeleton-box banner-skeleton" /> : null}
+          {!loading && adBanners.length > 0 ? (
+            <div className="ad-carousel-wrap">
+              <div className="ad-carousel-scroll" ref={carouselRef}>
+                {adBanners.map((url, index) => (
+                  <a key={`${url}-${index}`} className="ad-banner ad-slide" href={url} target="_blank" rel="noreferrer">
+                    <img src={url} alt={`Рекламный баннер ${index + 1}`} />
+                  </a>
+                ))}
+              </div>
+              {adBanners.length > 1 ? (
+                <div className="ad-dots">
+                  {adBanners.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={index === activeBannerIndex ? 'ad-dot active' : 'ad-dot'}
+                      onClick={() => setActiveBannerIndex(index)}
+                      aria-label={`Баннер ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
           ) : null}
         </header>
 

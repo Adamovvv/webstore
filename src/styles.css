@@ -80,6 +80,12 @@ select {
   font-size: 14px;
 }
 
+.muted {
+  color: #7e86a2;
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+
 .title-row {
   display: flex;
   align-items: flex-start;
@@ -170,11 +176,54 @@ select {
   height: 130px;
 }
 
+.ad-carousel-wrap {
+  margin-top: 16px;
+}
+
+.ad-carousel-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-right: 28px;
+}
+
+.ad-carousel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ad-slide {
+  flex: 0 0 calc(100% - 30px);
+  scroll-snap-align: start;
+  margin-top: 0;
+}
+
 .ad-banner img {
   width: 100%;
   height: auto;
   display: block;
   object-fit: cover;
+}
+
+.ad-dots {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ad-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  border: 0;
+  background: #c7cee7;
+}
+
+.ad-dot.active {
+  width: 18px;
+  background: #2f6cff;
 }
 
 .chips {
@@ -583,6 +632,51 @@ select {
 .admin-ad-settings p {
   margin: 8px 0 0;
   color: #58617f;
+}
+
+.admin-banners-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-banner-item {
+  border: 1px solid #dde4f7;
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px;
+}
+
+.admin-banner-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-banner-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-banner-actions button {
+  border: 0;
+  border-radius: 8px;
+  background: #e9edff;
+  padding: 6px 10px;
+}
+
+.admin-banner-actions .danger {
+  background: #ffe5ea;
+  color: #c4354f;
+}
+
+.admin-banner-preview {
+  margin-top: 10px;
+  width: 100%;
+  max-height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
 .table-wrap {

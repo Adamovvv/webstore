@@ -42,6 +42,7 @@ with check (true);
 create table if not exists public.store_settings (
   id integer primary key check (id = 1),
   ad_image_url text,
+  ad_banners jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -49,6 +50,8 @@ create table if not exists public.store_settings (
 insert into public.store_settings (id, ad_image_url)
 values (1, null)
 on conflict (id) do nothing;
+
+alter table public.store_settings add column if not exists ad_banners jsonb not null default '[]'::jsonb;
 
 alter table public.store_settings enable row level security;
 
