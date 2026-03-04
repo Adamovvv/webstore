@@ -5,7 +5,6 @@ const initialForm = {
   title: '',
   provider: '',
   category: 'Мегафон',
-  image_url: '',
   is_unlimited: false,
   badge: '',
   data_gb: '',
@@ -130,7 +129,6 @@ export default function AdminPage() {
       monthly_payment: Number(form.monthly_payment) || 0,
       old_price: form.old_price || null,
       badge: form.badge || null,
-      image_url: form.image_url || null,
     }
 
     if (editingId) {
@@ -152,7 +150,6 @@ export default function AdminPage() {
       title: item.title || '',
       provider: item.provider || '',
       category: item.category || 'eSIM',
-      image_url: item.image_url || '',
       is_unlimited: item.is_unlimited ?? false,
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
@@ -265,7 +262,6 @@ export default function AdminPage() {
             <option value="mts">Мтс</option>
             <option value="yota">Йота</option>
           </select>
-          <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
           <label className="admin-checkbox">
             <input type="checkbox" name="is_unlimited" checked={!!form.is_unlimited} onChange={handleChange} />
