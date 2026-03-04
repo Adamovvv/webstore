@@ -30,6 +30,15 @@ function getMonthlyPayment(item) {
   return amount != null ? `${formatPrice(amount)} ₽` : '-'
 }
 
+function getProviderKey(value) {
+  const next = String(value || '').trim().toLowerCase()
+  if (next.includes('mega') || next.includes('мега')) return 'megafon'
+  if (next.includes('bee') || next.includes('била')) return 'beeline'
+  if (next === 'mts' || next.includes('мтс')) return 'mts'
+  if (next.includes('yota') || next.includes('йота')) return 'yota'
+  return ''
+}
+
 function formatWhatsappLabel(value) {
   const digits = (value || '').replace(/\D/g, '')
   if (!digits) return ''
@@ -283,6 +292,7 @@ export default function StorePage() {
               {filtered.map((item) => {
                 const discount = getDiscount(item.old_price, item.price)
                 const isOpen = openedProductId === item.id
+                const providerKey = getProviderKey(item.provider)
                 return (
                 <article
                   key={item.id}
@@ -297,7 +307,10 @@ export default function StorePage() {
                     <div>
                       {item.badge ? <p className="meta">{item.badge}</p> : null}
                       <h3>{item.title}</h3>
-                      <p className="provider">{item.provider || '—'}</p>
+                      <p className="provider">
+                        {providerKey ? <span className={`provider-logo provider-logo-${providerKey}`} aria-hidden="true" /> : null}
+                        <span>{item.provider || '—'}</span>
+                      </p>
                     </div>
                     <div className="list-price-col">
                       <strong>{item.price != null ? `${formatPrice(item.price)} ₽` : '-'}</strong>
