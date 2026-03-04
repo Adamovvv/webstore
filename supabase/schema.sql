@@ -6,16 +6,20 @@ create table if not exists public.products (
   provider text not null,
   category text not null default 'eSIM',
   image_url text,
-  description text,
   is_unlimited boolean not null default false,
+  minutes integer not null default 0 check (minutes >= 0),
+  sms integer not null default 0 check (sms >= 0),
+  monthly_payment integer not null default 0 check (monthly_payment >= 0),
   badge text,
   data_gb integer not null check (data_gb >= 0),
   price integer not null check (price >= 0),
   old_price integer
 );
 
-alter table public.products add column if not exists description text;
 alter table public.products add column if not exists is_unlimited boolean not null default false;
+alter table public.products add column if not exists minutes integer not null default 0;
+alter table public.products add column if not exists sms integer not null default 0;
+alter table public.products add column if not exists monthly_payment integer not null default 0;
 
 alter table public.products enable row level security;
 
@@ -62,11 +66,11 @@ using (true)
 with check (true);
 
 -- Optional demo data
-insert into public.products (title, provider, category, image_url, badge, data_gb, price, old_price)
+insert into public.products (title, provider, category, image_url, badge, is_unlimited, data_gb, minutes, sms, monthly_payment, price, old_price)
 values
-('Europe eSIM 20GB', 'Airalo', 'Travel', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80', 'new', 20, 1599, 2199),
-('Russia Local 30GB', 'MegaFon', 'Local', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80', 'bestseller', 30, 1299, 1799),
-('Unlimited 7 days', 'Tinkoff Mobile', 'Unlimited', 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80', 'hot', 999, 999, 1499)
+('Europe eSIM 20GB', 'Airalo', 'Travel', 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80', 'new', false, 20, 600, 100, 1599, 1599, 2199),
+('Russia Local 30GB', 'MegaFon', 'Local', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80', 'bestseller', false, 30, 900, 300, 1299, 1299, 1799),
+('Unlimited 7 days', 'Tinkoff Mobile', 'Unlimited', 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80', 'hot', true, 0, 500, 100, 999, 999, 1499)
 on conflict do nothing;
 
 -- Ad image uploads bucket for admin panel

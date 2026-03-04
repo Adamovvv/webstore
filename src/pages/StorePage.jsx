@@ -18,6 +18,20 @@ function getTrafficLabel(item) {
   return item?.is_unlimited ? 'Безлимит' : `${item?.data_gb ?? '-'} GB`
 }
 
+function getMonthlyPayment(item) {
+  const amount = item?.monthly_payment ?? item?.price
+  return amount != null ? `${formatPrice(amount)} ₽` : '-'
+}
+
+function formatWhatsappLabel(value) {
+  const digits = (value || '').replace(/\D/g, '')
+  if (!digits) return ''
+  if (digits.length === 11 && digits.startsWith('7')) {
+    return `+7 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 9)}-${digits.slice(9, 11)}`
+  }
+  return `+${digits}`
+}
+
 export default function StorePage() {
   const [isDesktop, setIsDesktop] = useState(typeof window !== 'undefined' ? window.innerWidth > 768 : false)
   const [products, setProducts] = useState([])
@@ -28,6 +42,9 @@ export default function StorePage() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
+  const whatsappNumber = '79280013099'
+  const whatsappLabel = formatWhatsappLabel(whatsappNumber)
+  const whatsappHref = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
 
   useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth > 768)
@@ -112,6 +129,14 @@ export default function StorePage() {
         <header className="hero">
           <div className="title-row">
             <h1>Красивые номера &amp; Выгодные тарифы</h1>
+            <a className="whatsapp-link" href={whatsappHref} target="_blank" rel="noreferrer" aria-label="WhatsApp">
+              <span className="whatsapp-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" role="presentation">
+                  <path d="M20.52 3.48A11.82 11.82 0 0 0 12.03 0C5.42 0 .03 5.39.03 12c0 2.12.56 4.2 1.61 6.03L0 24l6.16-1.6A11.96 11.96 0 0 0 12.03 24c6.6 0 11.97-5.39 11.97-12 0-3.2-1.24-6.21-3.48-8.52Zm-8.49 18.5c-1.81 0-3.59-.49-5.14-1.41l-.37-.22-3.66.95.98-3.57-.24-.37A9.9 9.9 0 0 1 2.03 12c0-5.51 4.48-10 10-10 2.67 0 5.19 1.04 7.07 2.93A9.92 9.92 0 0 1 22.03 12c0 5.52-4.48 10-10 10Zm5.49-7.49c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.79-1.68-2.09-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.1 3.2 5.09 4.48.71.31 1.27.49 1.7.63.72.23 1.38.2 1.9.12.58-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35Z" />
+                </svg>
+              </span>
+              <span>{whatsappLabel}</span>
+            </a>
           </div>
           <div className="search-row">
             <div className="search-input-wrap">
@@ -149,12 +174,13 @@ export default function StorePage() {
 
         <section className="products-section">
           <div className="section-head">
-            <h2>{loading ? 'Loading...' : `${filtered.length} Товаров`}</h2>
+            <h2>{loading ? 'Loading...' : 'Доступные тарифы'}</h2>
           </div>
 
           <div className="products-list">
             {filtered.map((item) => {
-              const discount = getDiscount(item.old_price, item.price)
+              const currentPayment = item.monthly_payment ?? item.price
+              const discount = getDiscount(item.old_price, currentPayment)
               const isOpen = openedProductId === item.id
               return (
                 <article
@@ -173,7 +199,7 @@ export default function StorePage() {
                       <p className="meta">{getTrafficLabel(item)}</p>
                     </div>
                     <div className="list-price-col">
-                      <strong>{formatPrice(item.price)} ₽</strong>
+                      <strong>{getMonthlyPayment(item)}</strong>
                       {item.old_price ? <span className="old-price">{formatPrice(item.old_price)} ₽</span> : null}
                       {discount ? <span className="discount">{discount}% скидка</span> : null}
                       <span className="list-toggle">{isOpen ? 'Свернуть ▲' : 'Подробнее ▼'}</span>
@@ -181,13 +207,11 @@ export default function StorePage() {
                   </button>
                   <div className={isOpen ? 'list-card-details open' : 'list-card-details'}>
                     <div className="details-inner">
-                      <p className="modal-row"><span>Категория</span><strong>{item.category || '-'}</strong></p>
                       <p className="modal-row"><span>Трафик</span><strong>{getTrafficLabel(item)}</strong></p>
+                      <p className="modal-row"><span>Минуты</span><strong>{item.minutes ?? 0}</strong></p>
+                      <p className="modal-row"><span>SMS</span><strong>{item.sms ?? 0}</strong></p>
+                      <p className="modal-row"><span>Ежемесячный платеж</span><strong>{getMonthlyPayment(item)}</strong></p>
                       {item.badge ? <p className="modal-row"><span>Метка</span><strong>{item.badge}</strong></p> : null}
-                      <div className="modal-description">
-                        <p className="modal-description-title">Описание</p>
-                        <p>{item.description || 'Описание пока не добавлено.'}</p>
-                      </div>
                     </div>
                   </div>
                 </article>

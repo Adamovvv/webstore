@@ -6,11 +6,12 @@ const initialForm = {
   provider: '',
   category: 'Мегафон',
   image_url: '',
-  description: '',
   is_unlimited: false,
   badge: '',
   data_gb: '',
-  price: '',
+  minutes: '',
+  sms: '',
+  monthly_payment: '',
   old_price: '',
 }
 
@@ -122,7 +123,10 @@ export default function AdminPage() {
       ...form,
       is_unlimited: !!form.is_unlimited,
       data_gb: form.is_unlimited ? 0 : Number(form.data_gb),
-      description: form.description || null,
+      minutes: Number(form.minutes) || 0,
+      sms: Number(form.sms) || 0,
+      monthly_payment: Number(form.monthly_payment) || 0,
+      price: Number(form.monthly_payment) || 0,
       old_price: form.old_price || null,
       badge: form.badge || null,
       image_url: form.image_url || null,
@@ -148,11 +152,12 @@ export default function AdminPage() {
       provider: item.provider || '',
       category: item.category || 'eSIM',
       image_url: item.image_url || '',
-      description: item.description || '',
       is_unlimited: item.is_unlimited ?? false,
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
-      price: item.price ?? 0,
+      minutes: item.minutes ?? 0,
+      sms: item.sms ?? 0,
+      monthly_payment: item.monthly_payment ?? item.price ?? 0,
       old_price: item.old_price ?? 0,
     })
   }
@@ -258,19 +263,14 @@ export default function AdminPage() {
             <option value="mts">Мтс</option>
             <option value="yota">Йота</option>
           </select>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Описание товара"
-            rows={4}
-          />
           <input name="image_url" value={form.image_url} onChange={handleChange} placeholder="Image URL" />
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
           <label className="admin-checkbox">
             <input type="checkbox" name="is_unlimited" checked={!!form.is_unlimited} onChange={handleChange} />
             <span>Безлимитный интернет</span>
           </label>
+          <input type="number" name="minutes" value={form.minutes} onChange={handleChange} placeholder="Минуты" required />
+          <input type="number" name="sms" value={form.sms} onChange={handleChange} placeholder="SMS" required />
           <input
             type="number"
             name="data_gb"
@@ -280,7 +280,14 @@ export default function AdminPage() {
             required={!form.is_unlimited}
             disabled={!!form.is_unlimited}
           />
-          <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="Price" required />
+          <input
+            type="number"
+            name="monthly_payment"
+            value={form.monthly_payment}
+            onChange={handleChange}
+            placeholder="Ежемесячный платеж"
+            required
+          />
           <input type="number" name="old_price" value={form.old_price} onChange={handleChange} placeholder="Old price" />
 
           <div className="admin-actions">
@@ -319,7 +326,7 @@ export default function AdminPage() {
                   <th>Title</th>
                   <th>Provider</th>
                   <th>Category</th>
-                  <th>Price</th>
+                  <th>Ежемесячный платеж</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -329,7 +336,7 @@ export default function AdminPage() {
                     <td>{item.title}</td>
                     <td>{item.provider}</td>
                     <td>{item.category}</td>
-                    <td>?{item.price}</td>
+                    <td>{item.monthly_payment ?? item.price} ₽</td>
                     <td className="row-actions">
                       <button type="button" onClick={() => onEdit(item)}>Edit</button>
                       <button type="button" onClick={() => onDelete(item.id)} className="danger">Delete</button>

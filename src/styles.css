@@ -53,7 +53,7 @@ select {
 
 .title-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -62,6 +62,36 @@ select {
   margin: 6px 0 12px;
   font-size: 32px;
   line-height: 1.1;
+}
+
+.whatsapp-link {
+  margin-top: 6px;
+  text-decoration: none;
+  color: #1f2a56;
+  background: #ffffff;
+  border: 1px solid #dce6d7;
+  border-radius: 999px;
+  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.whatsapp-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  color: #1fa855;
+}
+
+.whatsapp-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
 }
 
 .search-input-wrap {
@@ -279,27 +309,6 @@ select {
   color: #1a2345;
   font-weight: 700;
   text-align: right;
-}
-
-.modal-description {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  background: #f3f6ff;
-}
-
-.modal-description-title {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #5e6788;
-}
-
-.modal-description > p:not(.modal-description-title) {
-  margin: 8px 0 0;
-  color: #2a3152;
-  line-height: 1.45;
 }
 
 .desktop-gate {
