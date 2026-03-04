@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { supabase } from '../lib/supabaseClient'
 
-const categories = ['Все', 'Мегафон', 'Билайн', 'Мтс', 'Йота']
+const categories = ['Все', 'megafon', 'beeline', 'mts', 'yota']
 
 function formatPrice(value) {
   if (value == null) return ''
