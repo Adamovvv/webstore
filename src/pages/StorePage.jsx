@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { supabase } from '../lib/supabaseClient'
 
-const categories = ['Все', 'megafon', 'beeline', 'mts', 'yota']
+const categories = ['all', 'megafon', 'beeline', 'mts', 'yota']
+const categoryLabels = {
+  all: 'Все',
+  megafon: 'Мегафон',
+  beeline: 'Билайн',
+  mts: 'МТС',
+  yota: 'Йота',
+}
 
 function formatPrice(value) {
   if (value == null) return ''
@@ -58,7 +65,7 @@ export default function StorePage() {
   const [adBanners, setAdBanners] = useState([])
   const [activeBannerIndex, setActiveBannerIndex] = useState(0)
   const [openedProductId, setOpenedProductId] = useState(null)
-  const [activeCategory, setActiveCategory] = useState('Все')
+  const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
   const [activeFaqIndex, setActiveFaqIndex] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -117,7 +124,7 @@ export default function StorePage() {
   useEffect(() => {
     let next = [...products]
 
-    if (activeCategory !== 'Все') {
+    if (activeCategory !== 'all') {
       next = next.filter((item) => item.category === activeCategory)
     }
 
@@ -243,7 +250,7 @@ export default function StorePage() {
                   className={category === activeCategory ? 'chip active' : 'chip'}
                   onClick={() => setActiveCategory(category)}
                 >
-                  {category}
+                  {categoryLabels[category] || category}
                 </button>
               ))}
         </div>

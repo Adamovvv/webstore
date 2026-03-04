@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 
 const initialForm = {
   title: '',
-  provider: '',
+  provider: 'megafon',
   category: 'megafon',
   is_unlimited: false,
   badge: '',
@@ -161,8 +161,8 @@ export default function AdminPage() {
     setEditingId(item.id)
     setForm({
       title: item.title || '',
-      provider: item.provider || '',
-      category: item.category || 'eSIM',
+      provider: item.provider || 'megafon',
+      category: item.category || 'megafon',
       is_unlimited: item.is_unlimited ?? false,
       badge: item.badge || '',
       data_gb: item.data_gb ?? 0,
@@ -305,11 +305,16 @@ export default function AdminPage() {
 
         <form className="admin-form" onSubmit={onSubmit}>
           <input name="title" value={form.title} onChange={handleChange} placeholder="Product title" required />
-          <input name="provider" value={form.provider} onChange={handleChange} placeholder="Provider" required />
+          <select name="provider" value={form.provider} onChange={handleChange}>
+            <option value="megafon">Мегафон</option>
+            <option value="beeline">Билайн</option>
+            <option value="mts">МТС</option>
+            <option value="yota">Йота</option>
+          </select>
           <select name="category" value={form.category} onChange={handleChange}>
             <option value="megafon">Мегафон</option>
             <option value="beeline">Билайн</option>
-            <option value="mts">Мтс</option>
+            <option value="mts">МТС</option>
             <option value="yota">Йота</option>
           </select>
           <input name="badge" value={form.badge} onChange={handleChange} placeholder="Badge (new / bestseller...)" />
@@ -430,4 +435,3 @@ export default function AdminPage() {
     </main>
   )
 }
-
