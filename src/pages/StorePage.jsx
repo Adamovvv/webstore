@@ -39,6 +39,13 @@ function getProviderKey(value) {
   return ''
 }
 
+const providerLogos = {
+  megafon: '/provider-logos/megafon.svg',
+  beeline: '/provider-logos/beeline.svg',
+  mts: '/provider-logos/mts.svg',
+  yota: '/provider-logos/yota.svg',
+}
+
 function formatWhatsappLabel(value) {
   const digits = (value || '').replace(/\D/g, '')
   if (!digits) return ''
@@ -308,7 +315,14 @@ export default function StorePage() {
                       {item.badge ? <p className="meta">{item.badge}</p> : null}
                       <h3>{item.title}</h3>
                       <p className="provider">
-                        {providerKey ? <span className={`provider-logo provider-logo-${providerKey}`} aria-hidden="true" /> : null}
+                        {providerKey ? (
+                          <img
+                            className="provider-logo-img"
+                            src={providerLogos[providerKey]}
+                            alt={item.provider || 'provider logo'}
+                            loading="lazy"
+                          />
+                        ) : null}
                         <span>{item.provider || '—'}</span>
                       </p>
                     </div>
