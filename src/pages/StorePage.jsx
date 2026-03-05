@@ -370,7 +370,7 @@ export default function StorePage() {
               </article>
               <article className="why-card">
                 <h3>🛡 Официальные SIM-карты</h3>
-                <p>Все номера официальные и регистрируются на владельца.</p>
+                <p>Все номера официальные и регистрируются на вас.</p>
               </article>
               <article className="why-card">
                 <h3>💸 Выгодные тарифы</h3>
