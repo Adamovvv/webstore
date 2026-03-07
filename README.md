@@ -14,7 +14,7 @@
    supabase/schema.sql
 5. Deploy Edge Function for reviews (strict one review per IP):
    - Set secret: `REVIEW_IP_SALT` (any long random string)
-   - Deploy function: `supabase functions deploy submit-review`
+   - Deploy function: `supabase functions deploy submit-review --no-verify-jwt`
 6. Run app:
    npm run dev
 

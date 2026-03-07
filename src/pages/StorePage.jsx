@@ -75,6 +75,10 @@ async function extractFunctionErrorCode(error) {
   }
 }
 
+function getFunctionStatusCode(error) {
+  return Number(error?.context?.status || 0)
+}
+
 const faqItems = [
   {
     question: 'Сколько времени занимает активация SIM-карты?',
@@ -278,6 +282,8 @@ export default function StorePage() {
       String(data?.error || '') ||
       (await extractFunctionErrorCode(error)) ||
       (String(error?.message || '').toLowerCase().includes('duplicate_ip') ? 'duplicate_ip' : '')
+    const errorStatus = getFunctionStatusCode(error)
+    const rawMessage = String(error?.message || '')
 
     const duplicateIp = errorCode === 'duplicate_ip'
     if (duplicateIp) {
@@ -291,10 +297,12 @@ export default function StorePage() {
         setReviewError('Сервер не настроен: отсутствует REVIEW_IP_SALT в функции.')
       } else if (errorCode === 'ip_not_found') {
         setReviewError('Не удалось определить IP. Попробуйте из другой сети или позже.')
+      } else if (errorStatus === 401 || rawMessage.toLowerCase().includes('jwt')) {
+        setReviewError('Функция submit-review отклоняет анонимный вызов (JWT). Разверните с --no-verify-jwt.')
       } else if (errorCode === 'method_not_allowed' || String(error?.message || '').includes('404')) {
         setReviewError('Функция submit-review не развернута в Supabase.')
       } else {
-        setReviewError('Не удалось отправить отзыв. Попробуйте позже.')
+        setReviewError(`Не удалось отправить отзыв. ${rawMessage ? `Детали: ${rawMessage}` : 'Попробуйте позже.'}`)
       }
       setReviewSubmitting(false)
       return
