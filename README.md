@@ -12,7 +12,10 @@
    - VITE_PUBLIC_APP_URL (your Vercel URL)
 4. In Supabase SQL Editor run:
    supabase/schema.sql
-5. Run app:
+5. Deploy Edge Function for reviews (strict one review per IP):
+   - Set secret: `REVIEW_IP_SALT` (any long random string)
+   - Deploy function: `supabase functions deploy submit-review`
+6. Run app:
    npm run dev
 
 ## Routes
