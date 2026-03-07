@@ -85,6 +85,12 @@ export default function StorePage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
   const [activeFaqIndex, setActiveFaqIndex] = useState(null)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [reviewModalOpen, setReviewModalOpen] = useState(false)
+  const [reviewSubmitLoading, setReviewSubmitLoading] = useState(false)
+  const [reviewSubmitError, setReviewSubmitError] = useState('')
+  const [reviewForm, setReviewForm] = useState({ name: '', text: '', rating: '5' })
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
   const carouselRef = useRef(null)
@@ -93,6 +99,26 @@ export default function StorePage() {
   const whatsappHref = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
   const loadingCards = [1, 2, 3, 4]
   const loadingFaq = [1, 2, 3]
+  const loadingReviews = [1, 2, 3]
+
+  const fetchReviews = async () => {
+    setReviewsLoading(true)
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('id, name, text, rating, created_at')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(12)
+
+    if (error) {
+      console.error(error)
+      setReviews([])
+    } else {
+      setReviews(data || [])
+    }
+
+    setReviewsLoading(false)
+  }
 
   useEffect(() => {
     const onResize = () => setIsDesktop(window.innerWidth > 768)
@@ -136,7 +162,44 @@ export default function StorePage() {
     }
 
     fetchStoreData()
+    fetchReviews()
   }, [])
+  const submitReview = async (event) => {
+    event.preventDefault()
+    if (reviewSubmitLoading) return
+
+    const nextName = reviewForm.name.trim()
+    const nextText = reviewForm.text.trim()
+    const rawRating = Number(reviewForm.rating)
+    const nextRating = Math.min(5, Math.max(1, Number.isFinite(rawRating) ? Math.round(rawRating) : 5))
+
+    if (!nextName || !nextText) {
+      setReviewSubmitError('Заполните имя и текст отзыва.')
+      return
+    }
+
+    setReviewSubmitLoading(true)
+    setReviewSubmitError('')
+
+    const { error } = await supabase.from('reviews').insert({
+      name: nextName,
+      text: nextText,
+      rating: nextRating,
+      is_approved: true,
+    })
+
+    if (error) {
+      console.error(error)
+      setReviewSubmitError('Не удалось отправить отзыв. Попробуйте еще раз.')
+      setReviewSubmitLoading(false)
+      return
+    }
+
+    setReviewForm({ name: '', text: '', rating: '5' })
+    setReviewSubmitLoading(false)
+    setReviewModalOpen(false)
+    fetchReviews()
+  }
 
   useEffect(() => {
     let next = [...products]
@@ -422,9 +485,92 @@ export default function StorePage() {
             </div>
           )}
         </section>
+        <section className="reviews-section" aria-label="Отзывы клиентов">
+          <div className="reviews-head">
+            <h2>Отзывы</h2>
+            <button type="button" className="review-write-btn" onClick={() => setReviewModalOpen(true)}>
+              Написать отзыв
+            </button>
+          </div>
+          {reviewsLoading ? (
+            <div className="reviews-list">
+              {loadingReviews.map((item) => (
+                <article key={item} className="review-card">
+                  <div className="skeleton-box skeleton-text-sm" />
+                  <div className="skeleton-box skeleton-text-lg" />
+                  <div className="skeleton-box skeleton-text-sm" />
+                </article>
+              ))}
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="reviews-carousel">
+              <div className={reviews.length > 1 ? 'reviews-track animate' : 'reviews-track'}>
+                {(reviews.length > 1 ? [...reviews, ...reviews] : reviews).map((item, index) => (
+                  <article key={`${item.id || item.name}-${index}`} className="review-card">
+                    <p className="review-rating">&#9733; {Math.round(Number(item.rating) || 0)}</p>
+                    <p className="review-text">{item.text}</p>
+                    <p className="review-name">{item.name}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p className="empty">Пока нет отзывов. Будьте первым.</p>
+          )}
+        </section>
+
+        {reviewModalOpen ? (
+          <div className="review-modal-backdrop" onClick={() => setReviewModalOpen(false)}>
+            <div className="review-modal" onClick={(event) => event.stopPropagation()}>
+              <h3>Написать отзыв</h3>
+              <form className="review-form" onSubmit={submitReview}>
+                <input
+                  type="text"
+                  placeholder="Ваше имя"
+                  value={reviewForm.name}
+                  onChange={(event) => setReviewForm((prev) => ({ ...prev, name: event.target.value }))}
+                  maxLength={70}
+                  required
+                />
+                <textarea
+                  placeholder="Ваш отзыв"
+                  value={reviewForm.text}
+                  onChange={(event) => setReviewForm((prev) => ({ ...prev, text: event.target.value }))}
+                  maxLength={500}
+                  required
+                />
+                <div className="review-stars-wrap">
+                  <span>Оценка</span>
+                  <div className="review-stars" role="radiogroup" aria-label="Оценка">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        role="radio"
+                        aria-checked={Number(reviewForm.rating) === star}
+                        aria-label={`Оценка ${star}`}
+                        className={Number(reviewForm.rating) >= star ? 'review-star active' : 'review-star'}
+                        onClick={() => setReviewForm((prev) => ({ ...prev, rating: String(star) }))}
+                      >
+                        &#9733;
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {reviewSubmitError ? <p className="review-form-error">{reviewSubmitError}</p> : null}
+                <div className="review-form-actions">
+                  <button type="button" className="secondary" onClick={() => setReviewModalOpen(false)}>
+                    Отмена
+                  </button>
+                  <button type="submit" disabled={reviewSubmitLoading}>
+                    {reviewSubmitLoading ? 'Отправка...' : 'Отправить'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
       </section>
     </main>
   )
 }
-
-

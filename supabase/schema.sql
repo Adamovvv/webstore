@@ -99,5 +99,41 @@ to authenticated
 using (bucket_id = 'store-assets')
 with check (bucket_id = 'store-assets');
 
-drop table if exists public.reviews;
 
+-- Reviews
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null check (char_length(name) between 2 and 70),
+  text text not null check (char_length(text) between 10 and 500),
+  rating integer not null check (rating >= 1 and rating <= 5),
+  is_approved boolean not null default true
+);
+
+
+alter table public.reviews alter column rating type integer using round(rating)::integer;
+alter table public.reviews drop constraint if exists reviews_rating_check;
+alter table public.reviews add constraint reviews_rating_check check (rating >= 1 and rating <= 5);
+alter table public.reviews enable row level security;
+
+drop policy if exists "Public can read approved reviews" on public.reviews;
+create policy "Public can read approved reviews"
+on public.reviews
+for select
+to anon
+using (is_approved = true);
+
+drop policy if exists "Public can insert reviews" on public.reviews;
+create policy "Public can insert reviews"
+on public.reviews
+for insert
+to anon
+with check (rating >= 1 and rating <= 5 and char_length(name) between 2 and 70 and char_length(text) between 10 and 500);
+
+drop policy if exists "Authenticated can manage reviews" on public.reviews;
+create policy "Authenticated can manage reviews"
+on public.reviews
+for all
+to authenticated
+using (true)
+with check (true);
