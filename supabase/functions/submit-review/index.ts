@@ -19,7 +19,14 @@ function jsonResponse(payload: Record<string, unknown>, status = 200) {
 function getClientIp(request: Request) {
   const forwarded = request.headers.get('x-forwarded-for')
   if (forwarded) return forwarded.split(',')[0]?.trim() || ''
-  return request.headers.get('cf-connecting-ip') || request.headers.get('x-real-ip') || ''
+  return (
+    request.headers.get('cf-connecting-ip') ||
+    request.headers.get('x-real-ip') ||
+    request.headers.get('x-client-ip') ||
+    request.headers.get('x-vercel-forwarded-for') ||
+    request.headers.get('fastly-client-ip') ||
+    ''
+  )
 }
 
 async function sha256(input: string) {
@@ -88,7 +95,7 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: 'duplicate_ip' }, 409)
   }
   if (error) {
-    return jsonResponse({ error: 'insert_failed' }, 500)
+    return jsonResponse({ error: 'insert_failed', code: error.code, details: error.message }, 500)
   }
 
   return jsonResponse({ review: data }, 200)

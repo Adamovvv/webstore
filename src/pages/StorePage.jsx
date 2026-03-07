@@ -65,6 +65,16 @@ function normalizeReviewRow(row) {
   }
 }
 
+async function extractFunctionErrorCode(error) {
+  if (!error?.context?.json) return ''
+  try {
+    const payload = await error.context.json()
+    return String(payload?.error || '')
+  } catch {
+    return ''
+  }
+}
+
 const faqItems = [
   {
     question: 'Сколько времени занимает активация SIM-карты?',
@@ -264,7 +274,12 @@ export default function StorePage() {
       },
     })
 
-    const duplicateIp = data?.error === 'duplicate_ip' || String(error?.message || '').toLowerCase().includes('duplicate_ip')
+    const errorCode =
+      String(data?.error || '') ||
+      (await extractFunctionErrorCode(error)) ||
+      (String(error?.message || '').toLowerCase().includes('duplicate_ip') ? 'duplicate_ip' : '')
+
+    const duplicateIp = errorCode === 'duplicate_ip'
     if (duplicateIp) {
       setReviewError('С этого IP уже был отправлен отзыв. Разрешен только один отзыв.')
       setReviewSubmitting(false)
@@ -272,7 +287,15 @@ export default function StorePage() {
     }
 
     if (error || !data?.review) {
-      setReviewError('Не удалось отправить отзыв. Попробуйте позже.')
+      if (errorCode === 'missing_env') {
+        setReviewError('Сервер не настроен: отсутствует REVIEW_IP_SALT в функции.')
+      } else if (errorCode === 'ip_not_found') {
+        setReviewError('Не удалось определить IP. Попробуйте из другой сети или позже.')
+      } else if (errorCode === 'method_not_allowed' || String(error?.message || '').includes('404')) {
+        setReviewError('Функция submit-review не развернута в Supabase.')
+      } else {
+        setReviewError('Не удалось отправить отзыв. Попробуйте позже.')
+      }
       setReviewSubmitting(false)
       return
     }
