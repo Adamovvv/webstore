@@ -107,34 +107,5 @@ to authenticated
 using (bucket_id = 'store-assets')
 with check (bucket_id = 'store-assets');
 
--- Reviews table
-create table if not exists public.reviews (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz not null default now(),
-  name text not null check (char_length(name) between 2 and 40),
-  city text,
-  rating integer not null check (rating between 1 and 5),
-  text text not null check (char_length(text) between 8 and 2000),
-  ip_hash text not null unique,
-  is_approved boolean not null default true
-);
-
-create index if not exists reviews_created_at_idx on public.reviews (created_at desc);
-
-alter table public.reviews enable row level security;
-
-drop policy if exists "Public can read approved reviews" on public.reviews;
-create policy "Public can read approved reviews"
-on public.reviews
-for select
-to anon
-using (is_approved = true);
-
-drop policy if exists "Authenticated can manage reviews" on public.reviews;
-create policy "Authenticated can manage reviews"
-on public.reviews
-for all
-to authenticated
-using (true)
-with check (true);
+drop table if exists public.reviews;
 

@@ -21,7 +21,6 @@ export default function AdminPage() {
   const [authLoading, setAuthLoading] = useState(true)
 
   const [products, setProducts] = useState([])
-  const [reviews, setReviews] = useState([])
   const [adBanners, setAdBanners] = useState([])
   const [form, setForm] = useState(initialForm)
   const [editingId, setEditingId] = useState(null)
@@ -30,7 +29,6 @@ export default function AdminPage() {
   const [adUploading, setAdUploading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState({})
   const [adSaving, setAdSaving] = useState(false)
-  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -88,26 +86,10 @@ export default function AdminPage() {
     setAdBanners(normalized.length > 0 ? normalized : [{ id: `banner-${Date.now()}`, url: '' }])
   }
 
-  const fetchReviews = async () => {
-    setReviewsLoading(true)
-    const { data, error } = await supabase
-      .from('reviews')
-      .select('id, name, city, rating, text, created_at')
-      .order('created_at', { ascending: false })
-      .limit(100)
-    if (error) {
-      alert(error.message)
-    } else {
-      setReviews(data || [])
-    }
-    setReviewsLoading(false)
-  }
-
   useEffect(() => {
     if (session) {
       fetchProducts()
       fetchStoreSettings()
-      fetchReviews()
     }
   }, [session])
 
@@ -201,17 +183,6 @@ export default function AdminPage() {
       return
     }
     await fetchProducts()
-  }
-
-  const onDeleteReview = async (id) => {
-    const ok = window.confirm('Delete this review?')
-    if (!ok) return
-    const { error } = await supabase.from('reviews').delete().eq('id', id)
-    if (error) {
-      alert(error.message)
-      return
-    }
-    await fetchReviews()
   }
 
   const updateBannerUrl = (id, value) => {
@@ -417,94 +388,9 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
-        </section>
-
-        <section className="admin-list">
-          <h2>Products</h2>
-          {!loading && products.length === 0 ? <p>No products yet.</p> : null}
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Provider</th>
-                  <th>Category</th>
-                  <th>Ежемесячный платеж</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading
-                  ? [1, 2, 3, 4].map((row) => (
-                      <tr key={row}>
-                        <td><div className="skeleton-box skeleton-text-md" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-md" /></td>
-                      </tr>
-                    ))
-                  : products.map((item) => (
-                      <tr key={item.id}>
-                        <td>{item.title}</td>
-                        <td>{item.provider}</td>
-                        <td>{item.category}</td>
-                        <td>{item.monthly_payment ?? item.price} ₽</td>
-                        <td className="row-actions">
-                          <button type="button" onClick={() => onEdit(item)}>Edit</button>
-                          <button type="button" onClick={() => onDelete(item.id)} className="danger">Delete</button>
-                        </td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="admin-list">
-          <h2>Отзывы</h2>
-          {!reviewsLoading && reviews.length === 0 ? <p>Пока нет отзывов.</p> : null}
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Имя</th>
-                  <th>Город</th>
-                  <th>Оценка</th>
-                  <th>Отзыв</th>
-                  <th>Дата</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reviewsLoading
-                  ? [1, 2, 3].map((row) => (
-                      <tr key={row}>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-md" /></td>
-                        <td><div className="skeleton-box skeleton-text-sm" /></td>
-                        <td><div className="skeleton-box skeleton-text-md" /></td>
-                      </tr>
-                    ))
-                  : reviews.map((item) => (
-                      <tr key={item.id}>
-                        <td>{item.name}</td>
-                        <td>{item.city || '-'}</td>
-                        <td>{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</td>
-                        <td>{item.text}</td>
-                        <td>{new Date(item.created_at).toLocaleString('ru-RU')}</td>
-                        <td className="row-actions">
-                          <button type="button" onClick={() => onDeleteReview(item.id)} className="danger">Удалить</button>
-                        </td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </section>
+        </section>`n</section>
     </main>
   )
 }
+
+

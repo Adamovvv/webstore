@@ -12,9 +12,7 @@
    - VITE_PUBLIC_APP_URL (your Vercel URL)
 4. In Supabase SQL Editor run:
    supabase/schema.sql
-5. Deploy Edge Function for reviews:
-   - Deploy function: `supabase functions deploy submit-review --no-verify-jwt`
-6. Run app:
+5. Run app:
    npm run dev
 
 ## Routes

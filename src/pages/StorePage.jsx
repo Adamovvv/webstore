@@ -55,29 +55,6 @@ function formatWhatsappLabel(value) {
   return `+${digits}`
 }
 
-function normalizeReviewRow(row) {
-  return {
-    id: row.id,
-    name: row.name || 'Пользователь',
-    city: row.city || 'Город не указан',
-    rating: Number(row.rating) || 5,
-    text: row.text || '',
-  }
-}
-
-async function extractFunctionErrorCode(error) {
-  if (!error?.context?.json) return ''
-  try {
-    const payload = await error.context.json()
-    return String(payload?.error || '')
-  } catch {
-    return ''
-  }
-}
-
-function getFunctionStatusCode(error) {
-  return Number(error?.context?.status || 0)
-}
 
 const faqItems = [
   {
@@ -108,16 +85,9 @@ export default function StorePage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
   const [activeFaqIndex, setActiveFaqIndex] = useState(null)
-  const [reviews, setReviews] = useState([])
-  const [activeReviewIndex, setActiveReviewIndex] = useState(0)
-  const [reviewForm, setReviewForm] = useState({ name: '', city: '', rating: 5, text: '' })
-  const [reviewError, setReviewError] = useState('')
-  const [reviewSuccess, setReviewSuccess] = useState('')
-  const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
   const [qrData, setQrData] = useState('')
   const carouselRef = useRef(null)
-  const reviewsCarouselRef = useRef(null)
   const whatsappNumber = '79280013099'
   const whatsappLabel = formatWhatsappLabel(whatsappNumber)
   const whatsappHref = `https://wa.me/${whatsappNumber.replace(/\D/g, '')}`
@@ -133,15 +103,15 @@ export default function StorePage() {
   useEffect(() => {
     const fetchStoreData = async () => {
       setLoading(true)
-      const [
-        { data, error },
-        { data: settingsData, error: settingsError },
-        { data: reviewsData, error: reviewsError },
-      ] = await Promise.all([
-        supabase.from('products').select('*').order('created_at', { ascending: false }),
-        supabase.from('store_settings').select('ad_image_url, ad_banners').eq('id', 1).maybeSingle(),
-        supabase.from('reviews').select('id, name, city, rating, text, created_at').order('created_at', { ascending: false }).limit(20),
-      ])
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('store_settings')
+        .select('ad_image_url, ad_banners')
+        .eq('id', 1)
+        .maybeSingle()
 
       if (error) {
         console.error(error)
@@ -161,12 +131,6 @@ export default function StorePage() {
           .map((item) => (typeof item === 'string' ? item : item?.url))
           .filter(Boolean)
         setAdBanners(normalized)
-      }
-
-      if (reviewsError) {
-        console.error(reviewsError)
-      } else {
-        setReviews((reviewsData || []).map(normalizeReviewRow))
       }
       setLoading(false)
     }
@@ -223,87 +187,6 @@ export default function StorePage() {
     if (!slide) return
     node.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' })
   }, [activeBannerIndex])
-
-  useEffect(() => {
-    if (activeReviewIndex >= reviews.length) {
-      setActiveReviewIndex(0)
-    }
-  }, [reviews, activeReviewIndex])
-
-  useEffect(() => {
-    if (reviews.length <= 1) return
-    const timer = setInterval(() => {
-      setActiveReviewIndex((prev) => (prev + 1) % reviews.length)
-    }, 4500)
-    return () => clearInterval(timer)
-  }, [reviews.length])
-
-  useEffect(() => {
-    const node = reviewsCarouselRef.current
-    if (!node) return
-    const slide = node.children[activeReviewIndex]
-    if (!slide) return
-    node.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' })
-  }, [activeReviewIndex])
-
-  const handleReviewSubmit = async (event) => {
-    event.preventDefault()
-    if (reviewSubmitting) return
-    const name = reviewForm.name.trim()
-    const city = reviewForm.city.trim()
-    const text = reviewForm.text.trim()
-    const rating = Math.min(5, Math.max(1, Number(reviewForm.rating) || 5))
-
-    if (name.length < 2) {
-      setReviewError('Введите имя (минимум 2 символа).')
-      setReviewSuccess('')
-      return
-    }
-    if (text.length < 8) {
-      setReviewError('Отзыв должен быть не короче 8 символов.')
-      setReviewSuccess('')
-      return
-    }
-
-    setReviewSubmitting(true)
-    setReviewError('')
-    setReviewSuccess('')
-
-    const { data, error } = await supabase.functions.invoke('submit-review', {
-      body: {
-        name,
-        city: city || null,
-        rating,
-        text,
-      },
-    })
-
-    const errorCode =
-      String(data?.error || '') ||
-      (await extractFunctionErrorCode(error))
-    const errorStatus = getFunctionStatusCode(error)
-    const rawMessage = String(error?.message || '')
-
-    if (error || !data?.review) {
-      if (errorCode === 'missing_env') {
-        setReviewError('Сервер не настроен. Проверьте переменные окружения функции.')
-      } else if (errorStatus === 401 || rawMessage.toLowerCase().includes('jwt')) {
-        setReviewError('Функция submit-review отклоняет анонимный вызов (JWT). Разверните с --no-verify-jwt.')
-      } else if (errorCode === 'method_not_allowed' || String(error?.message || '').includes('404')) {
-        setReviewError('Функция submit-review не развернута в Supabase.')
-      } else {
-        setReviewError(`Не удалось отправить отзыв. ${rawMessage ? `Детали: ${rawMessage}` : 'Попробуйте позже.'}`)
-      }
-      setReviewSubmitting(false)
-      return
-    }
-
-    setReviews((prev) => [normalizeReviewRow(data.review), ...prev])
-    setReviewForm({ name: '', city: '', rating: 5, text: '' })
-    setActiveReviewIndex(0)
-    setReviewSuccess('Спасибо! Ваш отзыв добавлен.')
-    setReviewSubmitting(false)
-  }
 
   if (isDesktop) {
     return (
@@ -539,102 +422,9 @@ export default function StorePage() {
             </div>
           )}
         </section>
-
-        <section className="reviews-section">
-          <h2>Отзывы</h2>
-
-          <form className="review-form" onSubmit={handleReviewSubmit}>
-            <label>
-              <span>Имя</span>
-              <input
-                type="text"
-                value={reviewForm.name}
-                onChange={(event) => setReviewForm((prev) => ({ ...prev, name: event.target.value }))}
-                placeholder="Ваше имя"
-                maxLength={40}
-                required
-              />
-            </label>
-            <label>
-              <span>Город</span>
-              <input
-                type="text"
-                value={reviewForm.city}
-                onChange={(event) => setReviewForm((prev) => ({ ...prev, city: event.target.value }))}
-                placeholder="Например, Москва"
-                maxLength={40}
-              />
-            </label>
-            <label>
-              <span>Оценка</span>
-              <div className="rating-picker" role="radiogroup" aria-label="Оценка">
-                {[1, 2, 3, 4, 5].map((value) => {
-                  const active = value <= reviewForm.rating
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      className={active ? 'rating-star active' : 'rating-star'}
-                      onClick={() => setReviewForm((prev) => ({ ...prev, rating: value }))}
-                      aria-label={`Поставить ${value} из 5`}
-                      aria-pressed={active}
-                    >
-                      ★
-                    </button>
-                  )
-                })}
-              </div>
-            </label>
-            <label>
-              <span>Отзыв</span>
-              <textarea
-                value={reviewForm.text}
-                onChange={(event) => setReviewForm((prev) => ({ ...prev, text: event.target.value }))}
-                placeholder="Расскажите о вашем опыте"
-                rows={4}
-                required
-              />
-            </label>
-            <button className="review-btn" type="submit" disabled={reviewSubmitting}>
-              {reviewSubmitting ? 'Отправка...' : 'Отправить отзыв'}
-            </button>
-            {reviewError ? <p className="review-status error">{reviewError}</p> : null}
-            {reviewSuccess ? <p className="review-status success">{reviewSuccess}</p> : null}
-          </form>
-
-          <div className="reviews-carousel-wrap">
-            <div className="reviews-carousel-scroll" ref={reviewsCarouselRef}>
-              {reviews.map((review) => (
-                <article key={review.id} className="review-card">
-                  <div className="review-head">
-                    <strong>{review.name}</strong>
-                    <span>{review.city}</span>
-                  </div>
-                  <p className="review-rating" aria-label={`Оценка ${review.rating} из 5`}>
-                    {'★'.repeat(review.rating)}
-                    {'☆'.repeat(5 - review.rating)}
-                  </p>
-                  <p>{review.text}</p>
-                </article>
-              ))}
-            </div>
-            {reviews.length === 0 ? <p className="empty">Пока нет отзывов. Будьте первым.</p> : null}
-            {reviews.length > 1 ? (
-              <div className="review-dots">
-                {reviews.map((review, index) => (
-                  <button
-                    key={review.id}
-                    type="button"
-                    className={index === activeReviewIndex ? 'review-dot active' : 'review-dot'}
-                    onClick={() => setActiveReviewIndex(index)}
-                    aria-label={`Отзыв ${index + 1}`}
-                  />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        </section>
       </section>
     </main>
   )
 }
+
+
