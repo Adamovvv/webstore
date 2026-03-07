@@ -388,7 +388,50 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
-        </section>`n</section>
+        </section>
+
+        <section className="admin-list">
+          <h2>Products</h2>
+          {!loading && products.length === 0 ? <p>No products yet.</p> : null}
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Provider</th>
+                  <th>Category</th>
+                  <th>Р•Р¶РµРјРµСЃСЏС‡РЅС‹Р№ РїР»Р°С‚РµР¶</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading
+                  ? [1, 2, 3, 4].map((row) => (
+                      <tr key={row}>
+                        <td><div className="skeleton-box skeleton-text-md" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-sm" /></td>
+                        <td><div className="skeleton-box skeleton-text-md" /></td>
+                      </tr>
+                    ))
+                  : products.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.title}</td>
+                        <td>{item.provider}</td>
+                        <td>{item.category}</td>
+                        <td>{item.monthly_payment ?? item.price} в‚Ѕ</td>
+                        <td className="row-actions">
+                          <button type="button" onClick={() => onEdit(item)}>Edit</button>
+                          <button type="button" onClick={() => onDelete(item.id)} className="danger">Delete</button>
+                        </td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
     </main>
   )
 }
