@@ -280,23 +280,13 @@ export default function StorePage() {
 
     const errorCode =
       String(data?.error || '') ||
-      (await extractFunctionErrorCode(error)) ||
-      (String(error?.message || '').toLowerCase().includes('duplicate_ip') ? 'duplicate_ip' : '')
+      (await extractFunctionErrorCode(error))
     const errorStatus = getFunctionStatusCode(error)
     const rawMessage = String(error?.message || '')
 
-    const duplicateIp = errorCode === 'duplicate_ip'
-    if (duplicateIp) {
-      setReviewError('С этого IP уже был отправлен отзыв. Разрешен только один отзыв.')
-      setReviewSubmitting(false)
-      return
-    }
-
     if (error || !data?.review) {
       if (errorCode === 'missing_env') {
-        setReviewError('Сервер не настроен: отсутствует REVIEW_IP_SALT в функции.')
-      } else if (errorCode === 'ip_not_found') {
-        setReviewError('Не удалось определить IP. Попробуйте из другой сети или позже.')
+        setReviewError('Сервер не настроен. Проверьте переменные окружения функции.')
       } else if (errorStatus === 401 || rawMessage.toLowerCase().includes('jwt')) {
         setReviewError('Функция submit-review отклоняет анонимный вызов (JWT). Разверните с --no-verify-jwt.')
       } else if (errorCode === 'method_not_allowed' || String(error?.message || '').includes('404')) {

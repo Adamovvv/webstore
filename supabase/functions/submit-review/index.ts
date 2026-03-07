@@ -16,27 +16,6 @@ function jsonResponse(payload: Record<string, unknown>, status = 200) {
   })
 }
 
-function getClientIp(request: Request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0]?.trim() || ''
-  return (
-    request.headers.get('cf-connecting-ip') ||
-    request.headers.get('x-real-ip') ||
-    request.headers.get('x-client-ip') ||
-    request.headers.get('x-vercel-forwarded-for') ||
-    request.headers.get('fastly-client-ip') ||
-    ''
-  )
-}
-
-async function sha256(input: string) {
-  const bytes = new TextEncoder().encode(input)
-  const digest = await crypto.subtle.digest('SHA-256', bytes)
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-}
-
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -47,14 +26,8 @@ Deno.serve(async (request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  const ipSalt = Deno.env.get('REVIEW_IP_SALT')
-  if (!supabaseUrl || !serviceRoleKey || !ipSalt) {
+  if (!supabaseUrl || !serviceRoleKey) {
     return jsonResponse({ error: 'missing_env' }, 500)
-  }
-
-  const ip = getClientIp(request)
-  if (!ip) {
-    return jsonResponse({ error: 'ip_not_found' }, 400)
   }
 
   let body: Record<string, unknown>
@@ -76,7 +49,6 @@ Deno.serve(async (request) => {
     return jsonResponse({ error: 'invalid_text' }, 400)
   }
 
-  const ipHash = await sha256(`${ipSalt}:${ip}`)
   const adminClient = createClient(supabaseUrl, serviceRoleKey)
   const { data, error } = await adminClient
     .from('reviews')
@@ -85,15 +57,12 @@ Deno.serve(async (request) => {
       city: city || null,
       rating,
       text,
-      ip_hash: ipHash,
+      ip_hash: crypto.randomUUID(),
       is_approved: true,
     })
     .select('id, name, city, rating, text, created_at')
     .single()
 
-  if (error?.code === '23505') {
-    return jsonResponse({ error: 'duplicate_ip' }, 409)
-  }
   if (error) {
     return jsonResponse({ error: 'insert_failed', code: error.code, details: error.message }, 500)
   }

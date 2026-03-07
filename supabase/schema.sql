@@ -107,7 +107,7 @@ to authenticated
 using (bucket_id = 'store-assets')
 with check (bucket_id = 'store-assets');
 
--- Reviews: one review per IP (enforced by unique ip_hash)
+-- Reviews table
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
