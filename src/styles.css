@@ -547,9 +547,9 @@ select {
   height: 34px;
   border: 0;
   border-radius: 8px;
-  background: #eef2ff;
+  background: none;
   color: #b9c1dd;
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1;
   display: inline-grid;
   place-items: center;
@@ -557,7 +557,6 @@ select {
 
 .rating-star.active {
   color: #e8a230;
-  background: #fff4da;
 }
 
 .review-form textarea {
@@ -565,16 +564,16 @@ select {
   min-height: 92px;
 }
 
-.review-form button {
+.review-btn {
   border: 0;
   border-radius: 10px;
   padding: 10px 12px;
   background: linear-gradient(135deg,#2563eb,#0ea5e9);
-  color: #fff;
+  color: #d9deee;
   font-weight: 700;
 }
 
-.review-form button:disabled {
+.review-btn button:disabled {
   opacity: 0.7;
 }
 

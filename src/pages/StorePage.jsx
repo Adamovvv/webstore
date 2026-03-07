@@ -574,7 +574,7 @@ export default function StorePage() {
                 required
               />
             </label>
-            <button type="submit" disabled={reviewSubmitting}>
+            <button className="review-btn" type="submit" disabled={reviewSubmitting}>
               {reviewSubmitting ? 'Отправка...' : 'Отправить отзыв'}
             </button>
             {reviewError ? <p className="review-status error">{reviewError}</p> : null}
