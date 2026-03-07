@@ -72,14 +72,6 @@ to authenticated
 using (true)
 with check (true);
 
--- Optional demo data
-insert into public.products (title, provider, category, badge, is_unlimited, data_gb, minutes, sms, monthly_payment, price, old_price)
-values
-('Europe eSIM 20GB', 'Airalo', 'Travel', 'new', false, 20, 600, 100, 1599, 1599, 2199),
-('Russia Local 30GB', 'MegaFon', 'Local', 'bestseller', false, 30, 900, 300, 1299, 1299, 1799),
-('Unlimited 7 days', 'Tinkoff Mobile', 'Unlimited', 'hot', true, 0, 500, 100, 999, 999, 1499)
-on conflict do nothing;
-
 -- Ad image uploads bucket for admin panel
 insert into storage.buckets (id, name, public)
 values ('store-assets', 'store-assets', true)
