@@ -1,4 +1,4 @@
--- Create products table
+﻿-- Create products table
 create table if not exists public.products (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -45,6 +45,7 @@ create table if not exists public.store_settings (
   id integer primary key check (id = 1),
   ad_image_url text,
   ad_banners jsonb not null default '[]'::jsonb,
+  connected_clients_count integer not null default 0 check (connected_clients_count >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -54,6 +55,7 @@ values (1, null)
 on conflict (id) do nothing;
 
 alter table public.store_settings add column if not exists ad_banners jsonb not null default '[]'::jsonb;
+alter table public.store_settings add column if not exists connected_clients_count integer not null default 0;
 
 alter table public.store_settings enable row level security;
 
@@ -111,6 +113,11 @@ create table if not exists public.reviews (
 );
 
 
+-- Policies can depend on rating, so drop first before ALTER TYPE
+drop policy if exists "Public can insert reviews" on public.reviews;
+drop policy if exists "Public can read approved reviews" on public.reviews;
+drop policy if exists "Authenticated can manage reviews" on public.reviews;
+
 alter table public.reviews alter column rating type integer using round(rating)::integer;
 alter table public.reviews drop constraint if exists reviews_rating_check;
 alter table public.reviews add constraint reviews_rating_check check (rating >= 1 and rating <= 5);
@@ -137,3 +144,6 @@ for all
 to authenticated
 using (true)
 with check (true);
+
+
+

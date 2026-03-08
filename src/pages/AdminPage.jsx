@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const initialForm = {
@@ -31,6 +31,8 @@ export default function AdminPage() {
   const [adUploading, setAdUploading] = useState(false)
   const [bannerUploading, setBannerUploading] = useState({})
   const [adSaving, setAdSaving] = useState(false)
+  const [connectedClientsCount, setConnectedClientsCount] = useState(0)
+  const [clientsUpdating, setClientsUpdating] = useState(false)
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -64,7 +66,7 @@ export default function AdminPage() {
   const fetchStoreSettings = async () => {
     const { data, error } = await supabase
       .from('store_settings')
-      .select('ad_image_url, ad_banners')
+      .select('ad_image_url, ad_banners, connected_clients_count')
       .eq('id', 1)
       .maybeSingle()
 
@@ -86,6 +88,7 @@ export default function AdminPage() {
       .filter((item) => item.url)
 
     setAdBanners(normalized.length > 0 ? normalized : [{ id: `banner-${Date.now()}`, url: '' }])
+    setConnectedClientsCount(Number(data?.connected_clients_count) > 0 ? Number(data.connected_clients_count) : 0)
   }
 
   const fetchReviews = async () => {
@@ -271,6 +274,20 @@ export default function AdminPage() {
     setBannerUploading((prev) => ({ ...prev, [id]: false }))
   }
 
+  const incrementConnectedClients = async () => {
+    setClientsUpdating(true)
+    const next = (Number(connectedClientsCount) || 0) + 1
+    const { error } = await supabase
+      .from('store_settings')
+      .upsert({ id: 1, connected_clients_count: next }, { onConflict: 'id' })
+
+    if (error) {
+      alert(error.message)
+    } else {
+      setConnectedClientsCount(next)
+    }
+    setClientsUpdating(false)
+  }
   const saveAdBanners = async () => {
     setAdSaving(true)
     const urls = adBanners.map((item) => item.url.trim()).filter(Boolean)
@@ -380,6 +397,15 @@ export default function AdminPage() {
           </div>
         </form>
 
+        <section className="admin-list">
+          <h2>Подключено клиентов</h2>
+          <p><strong>{connectedClientsCount}</strong></p>
+          <div className="admin-actions">
+            <button type="button" onClick={incrementConnectedClients} disabled={clientsUpdating}>
+              {clientsUpdating ? 'Обновление...' : '+1 подключение'}
+            </button>
+          </div>
+        </section>
         <section className="admin-ad-settings">
           <h2>Рекламные баннеры</h2>
           <p>Добавляйте несколько баннеров, меняйте порядок и сохраняйте одним кликом.</p>
@@ -505,5 +531,10 @@ export default function AdminPage() {
     </main>
   )
 }
+
+
+
+
+
 
 

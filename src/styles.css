@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg-dark: #0d1020;
   --card-bg: #f8f9fd;
   --ink: #1a1d2a;
@@ -537,8 +537,20 @@ select {
 }
 
 .reviews-carousel {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 14px;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
+.reviews-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.reviews-carousel.interacting .reviews-track.animate {
+  animation-play-state: paused;
 }
 
 .reviews-track {
@@ -941,5 +953,28 @@ td {
   padding: 8px 12px;
   background: #ebefff;
   color: #2f3660;
+}
+
+.clients-pill {
+  background: #ffffff;
+  border: 1px solid #dce3f6;
+  border-radius: 14px;
+  padding: 6px 10px;
+  display: grid;
+  gap: 6px;
+  min-width: fit-content;
+  text-align: right;
+}
+
+.clients-pill-label {
+  font-size: 10px;
+  color: #647094;
+  font-weight: 700;
+}
+
+.clients-pill-value {
+  font-size: 15px;
+  color: #1f62e0;
+  line-height: 1;
 }
 
